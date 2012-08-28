@@ -1,10 +1,54 @@
+$: << File.expand_path(File.dirname(__FILE__)) + '/lib'
+
 require 'rubygems'
 require 'sinatra'
 require 'pp'
-$: << File.expand_path(File.dirname(__FILE__))
+require 'xdcdn_uri'
+require 'radix62'
 
 APP_ROOT = File.dirname(__FILE__)
 
 set :port, 3003
 set :public, APP_ROOT + '/public'
 
+def xdcdn(dir)
+    XdcdnUri.new(dir)
+end
+
+configure :production do
+    set :ktk, xdcdn("/home/www/sites/ktk.xdcdn.net")
+done
+
+configure :development do
+    set :ktk, xdcdn("/Users/xdanger/Sites/xdcdn.net/ktk.xdcdn.net")
+done
+
+def pack_trees_hash(trees_hash)
+    index = []
+    trees_hash.each { |dir, tid|
+        key = Digest::SHA1.hexdigest(dir)[0..10].to_i(16).encode62
+        val = tid.to_i(16).encode62
+        index << "#{key}:#{val}"
+    }
+    return index.join("\n")
+end
+
+get '/ktk/index/:tag' do
+    begin
+        idx = settings.ktk.index("20120829A")
+        response['Cache-Control'] = 'max-age=31536000'
+        pack_trees_hash(idx)
+    rescue
+        response['Cache-Control'] = 'max-age=0'
+        "Error"
+    end
+end
+
+get '/ktk/tree/:tree/:file' do
+    tree_id = params[:tree].decode62.to_s(16)
+    blob = settings.ktk.file(tree_id, params[:file])
+    response['Content-Length'] = blob['bytes'].to_s
+    response['Cache-Control'] = 'max-age=31536000'
+    response['Content-Type'] = blob['mime_type']
+    blob['data']
+end
