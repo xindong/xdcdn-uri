@@ -6,23 +6,22 @@ require 'pp'
 require 'xdcdn_uri'
 require 'radix62'
 require 'zlib'
+require 'yaml'
 
 APP_ROOT = File.dirname(__FILE__)
 
 set :port, 3003
 set :public_folder, APP_ROOT + '/public'
 
-def xdcdn(dir)
-    XdcdnUri.new(dir)
-end
-
 configure :production do
-    set :ktk, xdcdn("/home/www/sites/ktk.xdcdn.net")
+    set :config, Proc.new { YAML::load_file(File.dirname(__FILE__) + '/config/production.yml') }
 end
 
 configure :development do
-    set :ktk, xdcdn("/Users/xdanger/Sites/xdcdn.net/ktk.xdcdn.net")
+    set :config, Proc.new { YAML::load_file(File.dirname(__FILE__) + '/config/development.yml') }
 end
+
+set :ktk, Proc.new { XdcdnUri.new(settings.config['ktk']['git']) }
 
 def pack_trees_hash(trees_hash)
     index = []
@@ -37,20 +36,25 @@ end
 get '/ktk/index/:tag' do
     begin
         idx = settings.ktk.index(params[:tag])
+        if idx.nil?
+            status 404
+            return
+        end
         response['Cache-Control'] = 'max-age=31536000'
         data = pack_trees_hash(idx)
         Zlib::Deflate.deflate(data, 9)
-    rescue
+    rescue => e
         response['Cache-Control'] = 'max-age=0'
-        "Error"
+        $stderr.puts e.backtrace
     end
 end
 
 get '/ktk/tree/:tree/:file' do
     tree_id = params[:tree].decode62.to_s(16)
     blob = settings.ktk.file(tree_id, params[:file])
-    response['Content-Length'] = blob['bytes'].to_s
-    response['Cache-Control'] = 'max-age=31536000'
-    response['Content-Type'] = blob['mime_type']
-    blob['data']
+    headers \
+        'Content-Length' => blob['bytes'].to_s,
+        'Cache-Control' => 'max-age=31536000',
+        'Content-Type' => blob['mime_type']
+    body blob['data']
 end

@@ -11,7 +11,9 @@ class XdcdnUri
     end
 
     def index(ref)
-        root = @repo.commits(ref, 1).first.tree
+        head = @repo.commits(ref, 1)
+        return nil if head.size == 0
+        root = head.first.tree
         @trees_hash['.'] = root.id
         root.trees.each { |tree| build_path(tree, []) }
         return @trees_hash
