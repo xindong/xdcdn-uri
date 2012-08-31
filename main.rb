@@ -12,6 +12,11 @@ require 'radix62'
 require 'zlib'
 require 'yaml'
 
+# 404 handler
+not_found do
+    ''
+end
+
 configure :production do
     set :config, Proc.new { YAML::load_file("#{APP_ROOT}/config/production.yml") }
 end
