@@ -74,7 +74,11 @@ get '/ktk/index/:tag' do
             $redis.set(key, dat)
             $redis.expire(key, 3600)
         end
-        body Zlib::Deflate.deflate(dat, 9)
+        if params[:nozip].nil?
+            body Zlib::Deflate.deflate(dat, 9)
+        else
+            body dat
+        end
     rescue Grit::NoSuchPathError => e
         broken_with 'Git Error'
     rescue Redis::ConnectionError => e
