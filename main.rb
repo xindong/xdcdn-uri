@@ -79,19 +79,25 @@ get '/ktk/index/:tag' do
             $redis.set(key, dat)
             $redis.expire(key, 3600)
         end
-        if params[:nozip].nil?
-            body Zlib::Deflate.deflate(dat, 9)
-        else
-            body dat
+        unless env['HTTP_ACCEPT_ENCODING'].nil?
+            headers 'X-DCDN-URI-Exception' => env['HTTP_ACCEPT_ENCODING']
+            env['HTTP_ACCEPT_ENCODING'].split(",").each do |ec|
+                if ec == 'deflate'
+                    headers \
+                        'Vary' => 'Accept-Encoding',
+                        'Content-Encoding' => 'gzip'
+                    body Zlib::Deflate.deflate(dat, 9)
+                    return
+                end
+            end
         end
+        body dat
     rescue Grit::NoSuchPathError => e
         broken_with 'Git Error'
     rescue Redis::ConnectionError => e
         broken_with 'Redis Error'
     rescue => e
         broken_with e.message
-    ensure
-        return
     end
 end
 
