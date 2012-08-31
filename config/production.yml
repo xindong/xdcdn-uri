@@ -1,2 +1,6 @@
 ktk:
-    git: /home/www/sites/ktk.xdcdn.net
+    git: /home/www/sites/ktk.xdcdn.net.git
+redis:
+    host: redis.ktpd.xd.com
+    port: 6379
+    base: 2

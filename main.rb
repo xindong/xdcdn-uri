@@ -1,27 +1,35 @@
-$: << File.expand_path(File.dirname(__FILE__)) + '/lib'
+APP_ROOT = File.dirname(__FILE__)
+
+$: << File.expand_path(APP_ROOT) + '/lib'
 
 require 'rubygems'
 require 'sinatra'
 require 'pp'
+require 'grit'
 require 'xdcdn_uri'
+require 'redis'
 require 'radix62'
 require 'zlib'
 require 'yaml'
 
-APP_ROOT = File.dirname(__FILE__)
-
-set :port, 3003
-set :public_folder, APP_ROOT + '/public'
-
 configure :production do
-    set :config, Proc.new { YAML::load_file(File.dirname(__FILE__) + '/config/production.yml') }
+    set :config, Proc.new { YAML::load_file("#{APP_ROOT}/config/production.yml") }
 end
-
 configure :development do
-    set :config, Proc.new { YAML::load_file(File.dirname(__FILE__) + '/config/development.yml') }
+    set :config, Proc.new { YAML::load_file("#{APP_ROOT}/config/development.yml") }
 end
 
+set :port, 3013
+set :public_folder, APP_ROOT + '/public'
 set :ktk, Proc.new { XdcdnUri.new(settings.config['ktk']['git']) }
+
+configure do
+    $redis = Redis.new(
+        :host => settings.config['redis']['host'],
+        :port => settings.config['redis']['port']
+    )
+    $redis.select(settings.config['redis']['base'])
+end
 
 def pack_trees_hash(trees_hash)
     index = []
@@ -33,28 +41,54 @@ def pack_trees_hash(trees_hash)
     return index.join("\n")
 end
 
+def no_cache
+    cache_control :private, :max_age => 0
+end
+
+def broken_with(msg)
+    status 500
+    headers 'X-DCDN-URI-Exception' => msg
+    $stderr.puts msg
+    no_cache
+end
+
+# 默认缓存1年
+before do
+  expires 31536000, :public, :must_revalidate
+end
+
 get '/ktk/index/:tag' do
+    idx = {}
+    tag = params[:tag]
+    key = "V:XdcdnUri:KtkIdx:#{tag}"
     begin
-        idx = settings.ktk.index(params[:tag])
-        if idx.nil?
-            status 404
-            return
+        dat = $redis.get(key)
+        if dat.nil?
+            idx = settings.ktk.index(params[:tag])
+            if idx.nil?
+                status 404
+                no_cache
+                return
+            end
+            dat = pack_trees_hash(idx)
+            $redis.set(key, dat)
+            $redis.expire(key, 3600)
         end
-        response['Cache-Control'] = 'max-age=31536000'
-        data = pack_trees_hash(idx)
-        Zlib::Deflate.deflate(data, 9)
+        body Zlib::Deflate.deflate(dat, 9)
+    rescue Grit::NoSuchPathError => e
+        broken_with 'Git Error'
+    rescue Redis::ConnectionError => e
+        broken_with 'Redis Error'
     rescue => e
-        response['Cache-Control'] = 'max-age=0'
-        $stderr.puts e.backtrace
+        broken_with e.message
+    ensure
+        return
     end
 end
 
 get '/ktk/tree/:tree/:file' do
     tree_id = params[:tree].decode62.to_s(16)
     blob = settings.ktk.file(tree_id, params[:file])
-    headers \
-        'Content-Length' => blob['bytes'].to_s,
-        'Cache-Control' => 'max-age=31536000',
-        'Content-Type' => blob['mime_type']
+    content_type blob['mime_type']
     body blob['data']
 end
