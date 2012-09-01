@@ -4,17 +4,18 @@ $: << File.expand_path(APP_ROOT) + '/lib'
 
 require 'rubygems'
 require 'sinatra'
-require 'pp'
 require 'grit'
 require 'xdcdn_uri'
 require 'redis'
-require 'radix62'
 require 'zlib'
 require 'yaml'
 
 # 404 handler
 not_found do
-    ''
+    no_cache
+    content_type 'text/plain; charset=utf-8'
+    "404\nfile not found
+    -- XINDONG CDN\n"
 end
 
 configure :production do
@@ -36,12 +37,17 @@ configure do
     $redis.select(settings.config['redis']['base'])
 end
 
-def pack_trees_hash(trees_hash)
+def pack_trees_hash(trees_hash, unpack = false)
     index = []
     trees_hash.each { |dir, tid|
-        key = Digest::SHA1.hexdigest(dir)[0..10].to_i(16).encode62
-        val = tid.to_i(16).encode62
-        index << "#{key}:#{val}"
+        if unpack
+            key = Digest::SHA1.hexdigest(dir)[0,10]
+            val = tid
+        else
+            key = Digest::SHA1.digest(dir)[0,5]
+            val = [tid].pack('H*')
+        end
+        index << "#{key}#{val}"
     }
     return index.join("\n")
 end
@@ -57,17 +63,34 @@ def broken_with(msg)
     no_cache
 end
 
+def deflate_body(dat)
+    if env['HTTP_ACCEPT_ENCODING'].nil? or dat.size < 10000
+        body dat
+    elsif env['HTTP_ACCEPT_ENCODING'].split(",").include? 'deflate'
+        gzipped = Zlib::Deflate.deflate(dat, 9)
+        if gzipped.size < dat.size * 0.8
+            headers \
+                'Vary' => 'Accept-Encoding',
+                'Content-Encoding' => 'gzip'
+            body gzipped
+        end
+    else
+        body dat
+    end
+end
+
 # 默认缓存1年
 before do
   expires 31536000, :public, :must_revalidate
 end
 
 get '/ktk/index/:tag' do
-    idx = {}
-    tag = params[:tag]
-    key = "V:XdcdnUri:KtkIdx:#{tag}"
+    unpack = params[:unpack] ? true : false
     begin
-        dat = $redis.get(key)
+        tag = params[:tag]
+        key = "V:XdcdnUri:KtkIdx:#{tag}"
+        dat = nil
+        dat = $redis.get(key) unless unpack
         if dat.nil?
             idx = settings.ktk.index(params[:tag])
             if idx.nil?
@@ -75,23 +98,14 @@ get '/ktk/index/:tag' do
                 no_cache
                 return
             end
-            dat = pack_trees_hash(idx)
-            $redis.set(key, dat)
-            $redis.expire(key, 3600)
-        end
-        unless env['HTTP_ACCEPT_ENCODING'].nil?
-            headers 'X-DCDN-URI-Exception' => env['HTTP_ACCEPT_ENCODING']
-            env['HTTP_ACCEPT_ENCODING'].split(",").each do |ec|
-                if ec == 'deflate'
-                    headers \
-                        'Vary' => 'Accept-Encoding',
-                        'Content-Encoding' => 'gzip'
-                    body Zlib::Deflate.deflate(dat, 9)
-                    return
-                end
+            dat = pack_trees_hash(idx, unpack)
+            unless unpack
+                $redis.set(key, dat)
+                $redis.expire(key, 3600)
             end
         end
-        body dat
+        content_type 'text/plain; charset=utf-8'
+        deflate_body dat
     rescue Grit::NoSuchPathError => e
         broken_with 'Git Error'
     rescue Redis::ConnectionError => e
@@ -102,8 +116,7 @@ get '/ktk/index/:tag' do
 end
 
 get '/ktk/tree/:tree/:file' do
-    tree_id = params[:tree].decode62.to_s(16)
-    blob = settings.ktk.file(tree_id, params[:file])
+    blob = settings.ktk.file(params[:tree], params[:file])
     content_type blob['mime_type']
-    body blob['data']
+    deflate_body blob['data']
 end
