@@ -4,38 +4,36 @@ $: << File.expand_path(APP_ROOT) + '/lib'
 
 require 'rubygems'
 require 'sinatra'
-require 'grit'
-require 'xdcdn_uri'
+require 'chandy'
 require 'redis'
 require 'zlib'
 require 'yaml'
 
-# 404 handler
-not_found do
-    no_cache
-    content_type 'text/plain; charset=utf-8'
-    "404\nfile not found
-    -- XINDONG CDN\n"
-end
+# =========================== configurations =========================
 
-configure :production do
-    set :config, Proc.new { YAML::load_file("#{APP_ROOT}/config/production.yml") }
-end
-configure :development do
-    set :config, Proc.new { YAML::load_file("#{APP_ROOT}/config/development.yml") }
-end
-
+set :bind, '0.0.0.0'
 set :port, 3013
 set :public_folder, APP_ROOT + '/public'
-set :ktk, Proc.new { XdcdnUri.new(settings.config['ktk']['git']) }
+set :static_cache_control, [:public, :max_age => 3600]
+enable :threaded, :protection
 
+configure :production do
+    $config = YAML::load_file("#{APP_ROOT}/config/production.yml")
+end
+configure :development do
+    $config = YAML::load_file("#{APP_ROOT}/config/development.yml")
+    enable :reload_templates
+end
 configure do
     $redis = Redis.new(
-        :host => settings.config['redis']['host'],
-        :port => settings.config['redis']['port']
+        :host => $config['redis']['host'],
+        :port => $config['redis']['port']
     )
-    $redis.select(settings.config['redis']['base'])
+    $redis.select($config['redis']['base'])
+    $uri = $config['repos'].merge($config['repos']) { |k, v| Chandy::Repo.new(v['git']) }
 end
+
+# =========================== functions ==============================
 
 def pack_trees_hash(trees_hash, unpack = false)
     index = []
@@ -49,18 +47,11 @@ def pack_trees_hash(trees_hash, unpack = false)
         end
         index << "#{key}#{val}"
     }
-    return index.join("\n")
+    return index.sort.join("\n")
 end
 
 def no_cache
     cache_control :private, :max_age => 0
-end
-
-def broken_with(msg)
-    status 500
-    headers 'X-DCDN-URI-Exception' => msg
-    $stderr.puts msg
-    no_cache
 end
 
 def deflate_body(dat)
@@ -79,25 +70,54 @@ def deflate_body(dat)
     end
 end
 
-# 默认缓存1年
-before do
-  expires 31536000, :public, :must_revalidate
+# =========================== hooks =================================
+
+error 404 do
+    no_cache
+    content_type 'text/plain; charset=utf-8'
+    body "404
+    file not found
+    -- XINDONG CDN\n"
 end
 
-get '/ktk/index/:tag' do
+error 500 do
+    no_cache
+    content_type 'text/plain; charset=utf-8'
+    body "500
+    internal server error
+    please try later
+    -- XINDONG CDN\n"
+end
+
+error Chandy::NotFound do 404 end
+error do
+    headers 'X-DCDN-URI-Exception' => msg
+    logger.error msg
+    500
+end
+
+before do
+    @repo = request.path_info.split('/')[1]
+    404 if $uri[@repo].nil?
+    # 默认缓存1年
+    expires 31536000, :public, :must_revalidate
+end
+
+after do
+    body '' if body.nil?
+end
+
+# ============================ actions ==============================
+
+get '/:repo/index/:tag' do
     unpack = params[:unpack] ? true : false
     begin
         tag = params[:tag]
-        key = "V:XdcdnUri:KtkIdx:#{tag}"
+        key = "V:Chandy:IDX:#{@repo}:#{tag}"
         dat = nil
         dat = $redis.get(key) unless unpack
         if dat.nil?
-            idx = settings.ktk.index(params[:tag])
-            if idx.nil?
-                status 404
-                no_cache
-                return
-            end
+            idx = $uri[@repo].index(params[:tag])
             dat = pack_trees_hash(idx, unpack)
             unless unpack
                 $redis.set(key, dat)
@@ -106,17 +126,21 @@ get '/ktk/index/:tag' do
         end
         content_type 'text/plain; charset=utf-8'
         deflate_body dat
-    rescue Grit::NoSuchPathError => e
-        broken_with 'Git Error'
-    rescue Redis::ConnectionError => e
-        broken_with 'Redis Error'
+    rescue Redis::CannotConnectError => e
+        500
+    rescue Chandy::NotFound => e
+        404
     rescue => e
-        broken_with e.message
+        raise e.message
     end
 end
 
-get '/ktk/tree/:tree/:file' do
-    blob = settings.ktk.file(params[:tree], params[:file])
+get '/:repo/listfiles/:tag' do
+    $uri.keys.join("\n")
+end
+
+get '/:repo/tree/:tree/:file' do
+    blob = $uri[@repo].file(params[:tree], params[:file])
     content_type blob['mime_type']
     deflate_body blob['data']
 end

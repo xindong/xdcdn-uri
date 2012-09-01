@@ -1,5 +1,6 @@
-ktk:
-    git: /Users/xdanger/Sites/xdcdn.net/ktk
+repos:
+    ktk:
+        git: /Users/xdanger/Sites/xdcdn.net/ktk
 redis:
     host: localhost
     port: 6379
