@@ -35,39 +35,40 @@ end
 
 # =========================== functions ==============================
 
-def pack_trees_hash(trees_hash, unpack = false)
-    index = []
-    trees_hash.each { |dir, tid|
+def pack_path_hash(hash, unpack = false)
+    data = []
+    hash.each { |pth, tid|
         if unpack
-            key = Digest::SHA1.hexdigest(dir)[0,10]
+            key = Digest::SHA1.hexdigest(pth)[0,10]
             val = tid
         else
-            key = Digest::SHA1.digest(dir)[0,5]
+            key = Digest::SHA1.digest(pth)[0,5]
             val = [tid].pack('H*')
         end
-        index << "#{key}#{val}"
+        data << "#{key}#{val}"
     }
-    return index.sort.join("\n")
+    return data.sort.join("\n")
 end
 
 def no_cache
     cache_control :private, :max_age => 0
 end
 
-def deflate_body(dat)
-    if env['HTTP_ACCEPT_ENCODING'].nil? or dat.size < 10000
-        body dat
+def deflate_body(data)
+    if env['HTTP_ACCEPT_ENCODING'].nil? or data.size < 10000
+        body data
     elsif env['HTTP_ACCEPT_ENCODING'].split(",").include? 'deflate'
-        gzipped = Zlib::Deflate.deflate(dat, 9)
-        if gzipped.size < dat.size * 0.8
+        logger.info "EEE"
+        gzipped = Zlib::Deflate.deflate(data, 9)
+        if gzipped.size < data.size * 0.8
             headers \
                 'Vary' => 'Accept-Encoding',
                 'Content-Encoding' => 'gzip'
             body gzipped
+            logger.info gzipped.size
         end
-    else
-        body dat
     end
+    body data
 end
 
 # =========================== hooks =================================
@@ -118,7 +119,7 @@ get '/:repo/index/:tag' do
         dat = $redis.get(key) unless unpack
         if dat.nil?
             idx = $uri[@repo].index(params[:tag])
-            dat = pack_trees_hash(idx, unpack)
+            dat = pack_path_hash(idx, unpack)
             unless unpack
                 $redis.set(key, dat)
                 $redis.expire(key, 3600)
@@ -135,8 +136,30 @@ get '/:repo/index/:tag' do
     end
 end
 
-get '/:repo/listfiles/:tag' do
-    $uri.keys.join("\n")
+get '/:repo/indexall/:tag' do
+    unpack = params[:unpack] ? true : false
+    begin
+        tag = params[:tag]
+        key = "V:Chandy:IDXAll:#{@repo}:#{tag}"
+        dat = nil
+        dat = $redis.get(key) unless unpack
+        if dat.nil?
+            idx = $uri[@repo].all_blobs(params[:tag])
+            dat = pack_path_hash(idx, unpack)
+            unless unpack
+                $redis.set(key, dat)
+                $redis.expire(key, 3600)
+            end
+        end
+        content_type 'text/plain; charset=utf-8'
+        deflate_body dat
+    rescue Redis::CannotConnectError => e
+        500
+    rescue Chandy::NotFound => e
+        404
+    rescue => e
+        raise e.message
+    end
 end
 
 get '/:repo/tree/:tree/:file' do

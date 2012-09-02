@@ -29,9 +29,12 @@ module Chandy
             { 'bytes' => blob.size, 'mime_type' => blob.mime_type, 'data' => blob.data }
         end
 
-        def all(ref)
-            root = head.first.tree
-
+        def all_blobs(ref)
+            blobs = {}
+            index(ref).each do |dir, tid|
+                @repo.tree(tid).blobs.each { |b| blobs["#{dir}/#{b.basename}"] = b.id }
+            end
+            return blobs
         end
 
         private
