@@ -19,6 +19,7 @@ enable :threaded, :protection
 
 configure :production do
     $config = YAML::load_file("#{APP_ROOT}/config/production.yml")
+    disable :show_exceptions
 end
 configure :development do
     $config = YAML::load_file("#{APP_ROOT}/config/development.yml")
@@ -90,16 +91,12 @@ error 500 do
     -- XINDONG CDN\n"
 end
 
-error Chandy::NotFound do 404 end
-error do
-    headers 'X-DCDN-URI-Exception' => msg
-    logger.error msg
-    500
-end
+error Chandy::NotFound do halt 404 end
+error do halt 500 end
 
 before do
     @repo = request.path_info.split('/')[1]
-    404 if $uri[@repo].nil?
+    halt 404 if $uri[@repo].nil?
     # 默认缓存1年
     expires 31536000, :public, :must_revalidate
 end
@@ -128,12 +125,10 @@ get '/:repo/index/:tag' do
         content_type 'text/plain; charset=utf-8'
         expires 3600, :public, :must_revalidate
         deflate_body dat
-    rescue Redis::CannotConnectError => e
-        500
     rescue Chandy::NotFound => e
-        404
+        halt 404
     rescue => e
-        raise e.message
+        halt 500
     end
 end
 
@@ -154,17 +149,19 @@ get '/:repo/indexall/:tag' do
         end
         content_type 'text/plain; charset=utf-8'
         deflate_body dat
-    rescue Redis::CannotConnectError => e
-        500
     rescue Chandy::NotFound => e
-        404
+        halt 404
     rescue => e
-        raise e.message
+        halt 500
     end
 end
 
 get '/:repo/tree/:tree/:file' do
-    blob = $uri[@repo].file(params[:tree], params[:file])
-    content_type blob['mime_type']
-    deflate_body blob['data']
+    begin
+        blob = $uri[@repo].file(params[:tree], params[:file])
+        content_type blob['mime_type']
+        deflate_body blob['data']
+    rescue Chandy::NotFound => e
+        halt 404
+    end
 end

@@ -25,7 +25,7 @@ module Chandy
 
         def file(tree, filename)
             blob = @repo.tree(tree) / filename
-            raise Chandy::NotFound if blob.nil?
+            raise Chandy::NotFound, "#{tree}/#{filename} not found" if blob.nil?
             { 'bytes' => blob.size, 'mime_type' => blob.mime_type, 'data' => blob.data }
         end
 
