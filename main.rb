@@ -126,6 +126,7 @@ get '/:repo/index/:tag' do
             end
         end
         content_type 'text/plain; charset=utf-8'
+        expires 3600, :public, :must_revalidate
         deflate_body dat
     rescue Redis::CannotConnectError => e
         500
