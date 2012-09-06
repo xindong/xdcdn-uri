@@ -29,8 +29,8 @@
 
 调用方法：
 
-  - 索引文件 CDN 缓存 **1小时**：<pre>http://uri.xdcdn.net/*<REPO_SLUG>*/index/*<GIT_TAG>*?proto=1.0</pre>
-  - 文件内容 CDN 缓存 **1年**：<pre>http://uri.xdcdn.net/*<REPO_SLUG>*/tree/*<GIT_TREE>*/*<FILE_NAME>*</pre>
+  - 索引文件（CDN 缓存 **1小时**）：<pre>http://uri.xdcdn.net/*<REPO_SLUG>*/index/*<GIT_TAG>*?proto=1.0</pre>
+  - 文件内容（CDN 缓存 **1年**）：<pre>http://uri.xdcdn.net/*<REPO_SLUG>*/tree/*<GIT_TREE>*/*<FILE_NAME>*</pre>
   
   索引文件格式：
   
