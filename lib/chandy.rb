@@ -9,7 +9,7 @@ module Chandy
 
         def initialize(repo_dir)
             begin
-                @repo = Grit::Repo.new(repo_dir)
+                @grit = Grit::Repo.new(repo_dir)
             rescue => e
                 raise Chandy::Error, e.message
             end
@@ -23,16 +23,33 @@ module Chandy
             return @trees_hash
         end
 
-        def file(tree, filename)
-            blob = @repo.tree(tree) / filename
-            raise Chandy::NotFound, "#{tree}/#{filename} not found" if blob.nil?
+        def file(args)
+            blob = nil
+            if args.has_key? :blob_id
+                blob = @grit.blob(args[:blob_id])
+                raise Chandy::NotFound, "blob_id: #{args[:blob_id]} not found" if blob.nil?
+            elsif args.has_key? :tree_id and args.has_key? :filename
+                blob = @grit.tree(args[:tree_id]) / args[:filename]
+                raise Chandy::NotFound, "#{args[:tree_id]}/#{args[:filename]} not found" if blob.nil?
+            else
+                raise Chandy::NotFound, "invalid args"
+            end
             { 'bytes' => blob.size, 'mime_type' => blob.mime_type, 'data' => blob.data }
+        end
+
+        def diff(tag1, tag2)
+            diffs = []
+            native_diff(tag1, tag2).each do |diff|
+                next if diff.b_path.nil?
+                diffs << [diff.b_path, diff.b_blob.id]
+            end
+            return diffs
         end
 
         def all_blobs(ref)
             blobs = {}
             index(ref).each do |dir, tid|
-                @repo.tree(tid).blobs.each { |b| blobs["#{dir}/#{b.basename}"] = b.id }
+                @grit.tree(tid).blobs.each { |b| blobs["#{dir}/#{b.basename}"] = b.id }
             end
             return blobs
         end
@@ -40,7 +57,7 @@ module Chandy
         private
 
         def root_tree_of(ref)
-            head = @repo.commits(ref, 1)
+            head = @grit.commits(ref, 1)
             raise Chandy::NotFound, "#{ref} not found" if head.size == 0
             return head.first.tree
         end
@@ -53,6 +70,15 @@ module Chandy
             tree.trees.each { |t| build_path(t, paths) }
         end
 
+        def native_diff(a, b, *paths)
+            diff = @grit.git.native('diff', {}, a, b, '--full-index', *paths)
+            if diff =~ /diff --git a/
+                diff = diff.sub(/.*?(diff --git a)/m, '\1')
+            else
+                diff = ''
+            end
+            Grit::Diff.list_from_string(@grit, diff)
+        end
     end
 
     class Error < StandardError
