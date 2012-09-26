@@ -203,6 +203,7 @@ get '/:repo/diff/:tag1..:tag2' do
             end
         end
         content_type 'text/plain; charset=utf-8'
+        expires 3600, :public, :must_revalidate
         deflate_body dat
     rescue Chandy::NotFound => e
         halt 404
