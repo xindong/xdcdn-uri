@@ -56,7 +56,11 @@ def pack_path_hash(hash, unpack = false)
         end
         data << "#{key}#{val}"
     }
-    return data.sort.join("\n")
+    if unpack
+        return data.sort.join("\n")
+    else
+        return data.sort.join("")
+    end
 end
 
 def no_cache
