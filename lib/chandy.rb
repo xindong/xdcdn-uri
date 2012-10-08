@@ -70,7 +70,7 @@ module Chandy
             paths = parents << tree.basename
             @trees_hash[paths.join('/')] = tree.id
             # 继续构建子目录
-            tree.trees.each { |t| build_path(t, paths) }
+            tree.trees.each { |t| build_path(t, paths.clone) }
         end
 
         def native_diff(a, b, *paths)
