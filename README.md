@@ -25,17 +25,17 @@
   1. 测试 OK 后打标签：git commit && git tag *20120907A* 表示 2012-09-07的第1个版本
   1. 提交标签
   <pre>git push && git push -\-tags</pre>
-  1. 检查源服务器更新状态 http://repo.xdcdn.net/status/*<REPO_SLUG>*.xdcdn.net.txt（为安全性考虑，目前仍需要 SVN 的帐号登录，今后改成公司 LDAP 帐号）
+  1. 检查源服务器更新状态 http://repo.xdcdn.net/status/REPO_SLUG.xdcdn.net.txt（为安全性考虑，目前仍需要 SVN 的帐号登录，今后改成公司 LDAP 帐号）
 
 调用方法：
 
   - 索引文件（CDN 缓存 **1小时**）：
-    - <pre>http://uri.xdcdn.net/*<REPO_SLUG>*/index/*<GIT_TAG>*?proto=1.0</pre>
-    - <pre>http://uri.xdcdn.net/*<REPO_SLUG>*/diff/*<GIT_TAG_1>*..*<GIT_TAG_2>*</pre>
+    - <pre>http://uri.xdcdn.net/REPO_SLUG/index/GIT_TAG?proto=1.0</pre>
+    - <pre>http://uri.xdcdn.net/REPO_SLUG/diff/GIT_TAG_1..GIT_TAG_2</pre>
   - 文件内容（CDN 缓存 **1年**）：
-    - <pre>http://uri.xdcdn.net/*<REPO_SLUG>*/tree/*<GIT_TREE>*/*<FILE_NAME>*</pre>
-    - <pre>http://uri.xdcdn.net/*<REPO_SLUG>*/file/*<BLOB_ID>*/*<FILE_NAME>*</pre>
-    - <pre>http://uri.xdcdn.net/*<REPO_SLUG>*/load/*<GIT_TAG>*/*<PATH_TO_FILE>*</pre>
+    - <pre>http://uri.xdcdn.net/REPO_SLUG/tree/GIT_TREE/FILE_NAME</pre>
+    - <pre>http://uri.xdcdn.net/REPO_SLUG/file/BLOB_ID/FILE_NAME</pre>
+    - <pre>http://uri.xdcdn.net/REPO_SLUG/load/GIT_TAG/PATH_TO_FILE</pre>
   - 内网地址：用 uri.xindong.com 代替 uri.xdcdn.net 进行测试
   
   索引文件格式：
