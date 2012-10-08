@@ -178,9 +178,29 @@ get '/:repo/file/:blob_id.:ext' do
     end
 end
 
+get '/:repo/file/:blob_id/:filename.:ext' do
+    begin
+        blob = $uri[@repo].file(:blob_id => params[:blob_id])
+        content_type params[:ext]
+        deflate_body blob['data']
+    rescue Chandy::NotFound => e
+        halt 404
+    end
+end
+
 get '/:repo/tree/:tree/:file' do
     begin
         blob = $uri[@repo].file(:tree_id => params[:tree], :filename => params[:file])
+        content_type blob['mime_type']
+        deflate_body blob['data']
+    rescue Chandy::NotFound => e
+        halt 404
+    end
+end
+
+get %r{^/([a-z]+)/load/([a-zA-Z0-9_\-]+)/([\w/\.]+)} do
+    begin
+        blob = $uri[@repo].file(:tag => params[:captures][1], :path => params[:captures][2])
         content_type blob['mime_type']
         deflate_body blob['data']
     rescue Chandy::NotFound => e

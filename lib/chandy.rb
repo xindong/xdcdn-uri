@@ -31,6 +31,9 @@ module Chandy
             elsif args.has_key? :tree_id and args.has_key? :filename
                 blob = @grit.tree(args[:tree_id]) / args[:filename]
                 raise Chandy::NotFound, "#{args[:tree_id]}/#{args[:filename]} not found" if blob.nil?
+            elsif args.has_key? :tag and args.has_key? :path
+                blob = root_tree_of(args[:tag]) / args[:path]
+                raise Chandy::NotFound, "#{args[:path]}@#{args[:tag]} not found" if blob.nil?
             else
                 raise Chandy::NotFound, "invalid args"
             end
