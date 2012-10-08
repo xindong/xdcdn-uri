@@ -29,21 +29,27 @@
 
 调用方法：
 
-  - 索引文件（CDN 缓存 **1小时**）：<pre>http://uri.xdcdn.net/*<REPO_SLUG>*/index/*<GIT_TAG>*?proto=1.0</pre>
-  - 文件内容（CDN 缓存 **1年**）：<pre>http://uri.xdcdn.net/*<REPO_SLUG>*/tree/*<GIT_TREE>*/*<FILE_NAME>*</pre>
+  - 索引文件（CDN 缓存 **1小时**）：
+    - <pre>http://uri.xdcdn.net/*<REPO_SLUG>*/index/*<GIT_TAG>*?proto=1.0</pre>
+    - <pre>http://uri.xdcdn.net/*<REPO_SLUG>*/diff/*<GIT_TAG_1>*..*<GIT_TAG_2>*</pre>
+  - 文件内容（CDN 缓存 **1年**）：
+    - <pre>http://uri.xdcdn.net/*<REPO_SLUG>*/tree/*<GIT_TREE>*/*<FILE_NAME>*</pre>
+    - <pre>http://uri.xdcdn.net/*<REPO_SLUG>*/file/*<BLOB_ID>*/*<FILE_NAME>*</pre>
+    - <pre>http://uri.xdcdn.net/*<REPO_SLUG>*/load/*<GIT_TAG>*/*<PATH_TO_FILE>*</pre>
+  - 内网地址：用 uri.xindong.com 代替 uri.xdcdn.net 进行测试
   
   索引文件格式：
   
   - 每行一个目录，LF（\\n） 分割，每行有25个字节
   - 前5个字节，以 php 代码：<pre>substr(sha1($dirname, true), 0, 5)</pre> $dirname 为 "abc/def/ghi" 形式，根目录为 "."
-  - 后20个字节为 tree_id，转换为 40 字节的 ascii 16进制的字符串，记下
+  - 后20个字节为 tree_id（index 协议） 或 blob_id（diff 协议），转换为 40 字节的 ascii 16进制的字符串，记下
 
 使用方法（以开天辟地为例，REPO_SLUG = *ktk*）：
 
   1. 完成 *更新过程* 后，在后台更新某个测试服的版本名，填入相应 tag，如 *20120825A*
   1. 网页接口根据后台信息，在页面里输出：
     - cdn_index: "<http://uri.xdcdn.net/ktk/index/20120825A>"
-    - cdn_root: "<http://uri.xdcdn.net/ktk/tree/>"
+    - cdn_root: "<http://uri.xdcdn.net/ktk/>"
   1. 客户端读取到索引文件，解析后存在一个 Hash/Map 类型变量中，key 为目录名的 sha1 值的前5个字节，值为 40 个字节的 tree_id
   1. 读取资源的函数，将目录名 sha1 后取前 5 个字节，到以上变量中查找相应的 key，然后拼凑下载 URL，如: 
     - 根目录下 Main.swf: <http://uri.xdcdn.net/ktk/tree/6234ab487915f9bf2cd287a67b44481d627001b8dce8e/Main.swf>
