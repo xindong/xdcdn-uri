@@ -25,7 +25,7 @@
   1. 测试 OK 后打标签：git commit && git tag *20120907A* 表示 2012-09-07的第1个版本
   1. 提交标签
   <pre>git push && git push -\-tags</pre>
-  1. 检查源服务器更新状态 http://repo.xdcdn.net/status/REPO_SLUG.xdcdn.net.txt（为安全性考虑，目前仍需要 SVN 的帐号登录，今后改成公司 LDAP 帐号）
+  1. 检查源服务器更新状态 http://repo.xdcdn.net/status/REPO_SLUG.xdcdn.net.txt （为安全性考虑，目前仍需要 SVN 的帐号登录，今后改成公司 LDAP 帐号）
 
 调用方法：
 
