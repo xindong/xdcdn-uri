@@ -36,6 +36,8 @@
     - <pre>http://uri.xdcdn.net/REPO_SLUG/tree/GIT_TREE/FILE_NAME</pre>
     - <pre>http://uri.xdcdn.net/REPO_SLUG/file/BLOB_ID/FILE_NAME</pre>
     - <pre>http://uri.xdcdn.net/REPO_SLUG/load/GIT_TAG/PATH_TO_FILE</pre>
+  - 预加载文件列表
+    - <pre>http://uri.xdcdn.net/REPO_SLUG/preload/GIT_TAG</pre>
   - 内网地址：用 uri.xindong.com 代替 uri.xdcdn.net 进行测试
   
   索引文件格式：
