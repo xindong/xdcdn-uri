@@ -57,6 +57,10 @@ module Chandy
             return blobs
         end
 
+        def grit
+            @grit            
+        end
+
         private
 
         def root_tree_of(ref)

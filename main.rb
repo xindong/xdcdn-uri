@@ -232,3 +232,16 @@ get '/:repo/diff/:tag1..:tag2' do
     end
 end
 
+get '/:repo/preload/:tag' do
+    data = []
+    pref = env['HTTP_ACCEPT_ENCODING']
+    $uri[@repo].index(params[:tag]).each { |dir, tid|
+        $uri[@repo].grit.tree(tid).blobs.each { |b|
+            data << "http://#{request.host}/#{params[:repo]}/tree/#{tid}/#{b.basename}"
+            data << "http://#{request.host}/#{params[:repo]}/file/#{b.id}/#{b.basename}"
+        }
+    }
+    content_type "text/plain; charset=utf-8"
+    data.join("\n")
+end
+
