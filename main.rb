@@ -198,7 +198,7 @@ get '/:repo/tree/:tree/:file' do
     end
 end
 
-get %r{^/([a-z]+)/load/([a-zA-Z0-9_\-]+)/([\w/\.]+)} do
+get %r{^/([a-z]+)/load/([a-zA-Z0-9_\-\.]+)/([\w/\.]+)} do
     begin
         blob = $uri[@repo].file(:tag => params[:captures][1], :path => params[:captures][2])
         content_type blob['mime_type']
