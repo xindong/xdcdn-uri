@@ -67,6 +67,14 @@ def no_cache
     cache_control :private, :max_age => 0
 end
 
+def echo_mt(mt)
+    begin
+        content_type mt
+    rescue RuntimeError
+        content_type 'application/octet-stream'
+    end
+end
+
 def deflate_body(data)
     body data and return
     if env['HTTP_ACCEPT_ENCODING'].nil? or data.size < 10000
@@ -88,7 +96,7 @@ end
 
 error 404 do
     no_cache
-    content_type 'text/plain; charset=utf-8'
+    echo_mt 'text/plain; charset=utf-8'
     body "404
     file not found
     -- XINDONG CDN\n"
@@ -96,7 +104,7 @@ end
 
 error 500 do
     no_cache
-    content_type 'text/plain; charset=utf-8'
+    echo_mt 'text/plain; charset=utf-8'
     body "500
     internal server error
     please try later
@@ -134,7 +142,7 @@ get '/:repo/index/:tag' do
                 $redis.expire(key, 3600)
             end
         end
-        content_type 'text/plain; charset=utf-8'
+        echo_mt 'text/plain; charset=utf-8'
         expires 3600, :public, :must_revalidate
         deflate_body dat
     rescue Chandy::NotFound => e
@@ -159,7 +167,7 @@ get '/:repo/files/:tag' do
                 $redis.expire(key, 3600)
             end
         end
-        content_type 'text/plain; charset=utf-8'
+        echo_mt 'text/plain; charset=utf-8'
         deflate_body dat
     rescue Chandy::NotFound => e
         halt 404
@@ -171,7 +179,7 @@ end
 get '/:repo/file/:blob_id.:ext' do
     begin
         blob = $uri[@repo].file(:blob_id => params[:blob_id])
-        content_type params[:ext]
+        echo_mt params[:ext]
         deflate_body blob['data']
     rescue Chandy::NotFound => e
         halt 404
@@ -181,7 +189,7 @@ end
 get '/:repo/file/:blob_id/:filename.:ext' do
     begin
         blob = $uri[@repo].file(:blob_id => params[:blob_id])
-        content_type params[:ext]
+        echo_mt params[:ext]
         deflate_body blob['data']
     rescue Chandy::NotFound => e
         halt 404
@@ -191,7 +199,7 @@ end
 get '/:repo/tree/:tree/:file' do
     begin
         blob = $uri[@repo].file(:tree_id => params[:tree], :filename => params[:file])
-        content_type blob['mime_type']
+        echo_mt blob['mime_type']
         deflate_body blob['data']
     rescue Chandy::NotFound => e
         halt 404
@@ -201,7 +209,7 @@ end
 get %r{^/([a-z]+)/load/([a-zA-Z0-9_\-\.]+)/([\w/\.]+)} do
     begin
         blob = $uri[@repo].file(:tag => params[:captures][1], :path => params[:captures][2])
-        content_type blob['mime_type']
+        echo_mt blob['mime_type']
         deflate_body blob['data']
     rescue Chandy::NotFound => e
         halt 404
@@ -222,7 +230,7 @@ get '/:repo/diff/:tag1..:tag2' do
                 $redis.expire(key, 3600)
             end
         end
-        content_type 'text/plain; charset=utf-8'
+        echo_mt 'text/plain; charset=utf-8'
         expires 3600, :public, :must_revalidate
         deflate_body dat
     rescue Chandy::NotFound => e
@@ -241,7 +249,7 @@ get '/:repo/preload/:tag' do
             data << "http://#{request.host}/#{params[:repo]}/file/#{b.id}/#{b.basename}"
         }
     }
-    content_type "text/plain; charset=utf-8"
+    echo_mt "text/plain; charset=utf-8"
     data.join("\n")
 end
 
