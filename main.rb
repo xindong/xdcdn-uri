@@ -118,7 +118,7 @@ before do
     @repo = request.path_info.split('/')[1]
     halt 404 if $uri[@repo].nil?
     # 默认缓存1年
-    expires 31536000, :public, :must_revalidate
+    expires 31536000
 end
 
 after do
