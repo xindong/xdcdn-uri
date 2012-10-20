@@ -8,6 +8,7 @@ require 'chandy'
 require 'redis'
 require 'zlib'
 require 'yaml'
+require 'time'
 
 # =========================== configurations =========================
 
@@ -122,7 +123,8 @@ before do
     # 默认缓存1年
     headers \
         'Server' => 'XCDNWS/1.0',
-        'Date' => Time.now.to_s
+        'Date' => Time.now.rfc2822,
+        'X-Response-On' => Time.now.to_s
     expires 31536000
 end
 
