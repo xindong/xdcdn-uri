@@ -15,7 +15,9 @@ set :bind, '0.0.0.0'
 set :port, 3013
 set :public_folder, APP_ROOT + '/public'
 set :static_cache_control, [:public, :max_age => 3600]
-enable :threaded, :protection
+
+disable :protection
+enable :threaded
 
 configure :production do
     $config = YAML::load_file("#{APP_ROOT}/config/production.yml")
@@ -118,8 +120,10 @@ before do
     @repo = request.path_info.split('/')[1]
     halt 404 if $uri[@repo].nil?
     # 默认缓存1年
+    headers \
+        'Server' => 'XCDNWS/1.0',
+        'Date' => Time.now.to_s
     expires 31536000
-    headers 'X-Response-On' => Time.now.to_s
 end
 
 after do
