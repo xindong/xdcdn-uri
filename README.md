@@ -42,8 +42,8 @@
   
   索引文件格式：
   
-  - 每行一个目录，LF（\\n） 分割，每行有25个字节
-  - 前5个字节，以 php 代码：<pre>substr(sha1($dirname, true), 0, 5)</pre> $dirname 为 "abc/def/ghi" 形式，根目录为 "."
+  - 每25个字节为一段
+  - 每段前5个字节，以 php 代码：<pre>substr(sha1($dirname, true), 0, 5)</pre> $dirname 为 "abc/def/ghi" 形式，根目录为 "."
   - 后20个字节为 tree_id（index 协议） 或 blob_id（diff 协议），转换为 40 字节的 ascii 16进制的字符串，记下
 
 使用方法（以开天辟地为例，REPO_SLUG = *ktk*）：
