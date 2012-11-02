@@ -13,7 +13,6 @@ require 'time'
 # =========================== configurations =========================
 
 set :bind, '0.0.0.0'
-set :port, 3013
 set :public_folder, APP_ROOT + '/public'
 set :static_cache_control, [:public, :max_age => 3600]
 
