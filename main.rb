@@ -146,6 +146,8 @@ get '/:repo/index/:tag' do
             unless unpack
                 $redis.set(key, dat)
                 $redis.expire(key, 3600)
+            else
+                $redis.del(key)
             end
         end
         echo_mt 'text/plain; charset=utf-8'
@@ -171,6 +173,8 @@ get '/:repo/files/:tag' do
             unless unpack
                 $redis.set(key, dat)
                 $redis.expire(key, 3600)
+            else
+                $redis.del(key)
             end
         end
         echo_mt 'text/plain; charset=utf-8'
@@ -234,6 +238,8 @@ get '/:repo/diff/:tag1..:tag2' do
             unless unpack
                 $redis.set(key, dat)
                 $redis.expire(key, 3600)
+            else
+                $redis.del(key)
             end
         end
         echo_mt 'text/plain; charset=utf-8'
