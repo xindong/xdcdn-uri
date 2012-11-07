@@ -43,7 +43,7 @@ module Chandy
         def diff(tag1, tag2)
             diffs = []
             native_diff(tag1, tag2).each do |diff|
-                next if diff.b_path.nil?
+                next if diff.b_path.nil? or diff.b_blob.nil?
                 diffs << [diff.b_path, diff.b_blob.id]
             end
             return diffs
