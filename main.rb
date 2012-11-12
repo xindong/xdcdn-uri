@@ -35,13 +35,14 @@ configure do
     $redis.select($config['redis']['base'])
     $uri = $config['repos'].merge($config['repos']) { |k, v| Chandy::Repo.new(v['git']) }
 
-    set :content_type, 'application/octet-stream'
-    mime_type :jpg , 'image/jpeg'
-    mime_type :jpeg, 'image/jpeg'
-    mime_type :png , 'image/png'
-    mime_type :swf , 'application/x-shockwave-flash'
-    mime_type :xml , 'application/xml'
-    mime_type :zip , 'application/zip'
+    set :content_type , 'application/octet-stream'
+    mime_type :jpg    , 'image/jpeg'
+    mime_type :jpeg   , 'image/jpeg'
+    mime_type :png    , 'image/png'
+    mime_type :swf    , 'application/x-shockwave-flash'
+    mime_type :xml    , 'application/xml'
+    mime_type :zip    , 'application/zip'
+    mime_type :unity3d, 'application/vnd.unity'
 end
 
 # =========================== functions ==============================
