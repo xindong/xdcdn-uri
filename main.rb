@@ -43,6 +43,13 @@ configure do
     mime_type :xml    , 'application/xml'
     mime_type :zip    , 'application/zip'
     mime_type :unity3d, 'application/vnd.unity'
+
+    #orig_stdout = $stdout
+    #$stdout = File.new('/dev/null', 'w')
+    unity = MIME::Types['application/vnd.unity'].first.to_hash
+    unity['Extensions'].push('unity3d')
+    MIME::Types.add(MIME::Type.from_hash(unity))
+    #$stdout = orig_stdout
 end
 
 # =========================== functions ==============================
