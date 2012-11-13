@@ -9,6 +9,7 @@ require 'redis'
 require 'zlib'
 require 'yaml'
 require 'time'
+require 'pp'
 
 # =========================== configurations =========================
 
@@ -260,9 +261,17 @@ get '/:repo/diff/:tag1..:tag2' do
     end
 end
 
+get '/:repo/preload/:tag1..:tag2' do
+    data = []
+    $uri[@repo].diff(params[:tag1], params[:tag2]).each { |path, blob|
+        data << "http://#{request.host}/#{params[:repo]}/file/#{blob}/#{File.basename(path)}"
+    }
+    echo_mt "text/plain; charset=utf-8"
+    data.join("\n")
+end
+
 get '/:repo/preload/:tag' do
     data = []
-    pref = env['HTTP_ACCEPT_ENCODING']
     $uri[@repo].index(params[:tag]).each { |dir, tid|
         $uri[@repo].grit.tree(tid).blobs.each { |b|
             data << "http://#{request.host}/#{params[:repo]}/tree/#{tid}/#{b.basename}"
@@ -272,4 +281,3 @@ get '/:repo/preload/:tag' do
     echo_mt "text/plain; charset=utf-8"
     data.join("\n")
 end
-
