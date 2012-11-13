@@ -42,7 +42,7 @@ configure do
     mime_type :swf    , 'application/x-shockwave-flash'
     mime_type :xml    , 'application/xml'
     mime_type :zip    , 'application/zip'
-    mime_type :unity3d, 'application/vnd.unity'
+    mime_type :unity3d, 'application/octet-stream'
 
     #orig_stdout = $stdout
     #$stdout = File.new('/dev/null', 'w')
