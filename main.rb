@@ -132,6 +132,7 @@ before do
     headers \
         'Server' => 'XCDNWS/1.0',
         'Date' => Time.now.rfc2822,
+        'Last-Modified' => Time.now.rfc2822,
         'X-Response-On' => Time.now.to_s
     expires 31536000
 end
