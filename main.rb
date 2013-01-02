@@ -150,7 +150,7 @@ get '/:repo/index/:tag' do
         key = "V:Chandy:IDX:#{@repo}:#{tag}"
         dat = nil
         dat = $redis.get(key) unless unpack
-        if dat.nil?
+        if dat.nil? or dat.empty?
             idx = $uri[@repo].index(params[:tag])
             dat = pack_path_hash(idx, unpack)
             unless unpack
@@ -177,7 +177,7 @@ get '/:repo/files/:tag' do
         key = "V:Chandy:IDXAll:#{@repo}:#{tag}"
         dat = nil
         dat = $redis.get(key) unless unpack
-        if dat.nil?
+        if dat.nil? or dat.empty?
             idx = $uri[@repo].all_blobs(params[:tag])
             dat = pack_path_hash(idx, unpack)
             unless unpack
@@ -242,7 +242,7 @@ get '/:repo/diff/:tag1..:tag2' do
         key = "V:Chandy:Diff:#{@repo}:#{params[:tag1]}..#{params[:tag2]}"
         dat = nil
         dat = $redis.get(key) unless unpack
-        if dat.nil?
+        if dat.nil? or dat.empty?
             idx = $uri[@repo].diff(params[:tag1], params[:tag2])
             dat = pack_path_hash(idx, unpack)
             unless unpack
