@@ -5,6 +5,8 @@ repos:
         git: /Users/xdanger/Sites/xdcdn.net/jsk
     sgf:
         git: /Users/xdanger/Sites/xdcdn.net/sgf
+    sxd:
+        git: /Users/xdanger/Sites/xdcdn.net/sxd
 redis:
     host: localhost
     port: 6379

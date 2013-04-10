@@ -1,5 +1,8 @@
 require 'grit'
 
+Grit::Git.git_timeout = 60
+Grit::Git.git_max_size = 10485760
+
 module Chandy
 
     class Repo
