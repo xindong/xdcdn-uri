@@ -76,6 +76,7 @@ end
 
 def no_cache
     cache_control :private, :max_age => 0
+    expires 0
 end
 
 def echo_mt(mt)
@@ -130,7 +131,6 @@ before do
     halt 404 if $uri[@repo].nil?
     # 默认缓存1年
     headers \
-        'Server' => 'XCDNWS/1.0',
         'Date' => Time.now.rfc2822,
         'Last-Modified' => Time.now.rfc2822,
         'X-Response-On' => Time.now.to_s
