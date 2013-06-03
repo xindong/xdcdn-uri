@@ -15,7 +15,7 @@ require 'pp'
 
 set :bind, '0.0.0.0'
 set :public_folder, APP_ROOT + '/public'
-set :static_cache_control, [:public, :max_age => 3600]
+set :static_cache_control, [:public, { :max_age => 3600 }]
 
 disable :protection
 enable :threaded
