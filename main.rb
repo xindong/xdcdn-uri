@@ -21,13 +21,15 @@ disable :protection
 enable :threaded
 
 configure :production do
-    $config = YAML::load_file("#{APP_ROOT}/config/production.yml")
     disable :show_exceptions
 end
+
 configure :development do
-    $config = YAML::load_file("#{APP_ROOT}/config/development.yml")
     enable :reload_templates
 end
+
+$config = YAML::load_file("#{APP_ROOT}/config/#{ENV['CONFIG_FILE']}.yml")
+
 configure do
     $redis = Redis.new(
         :host => $config['redis']['host'],
