@@ -1,7 +1,6 @@
 .DS_Store
 !.gitignore
-config/*.yml
-log
+log/*.log
 tmp/restart.txt
 .elasticbeanstalk/
 Gemfile.lock

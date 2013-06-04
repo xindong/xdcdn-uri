@@ -1,0 +1,17 @@
+repos:
+    ktk:
+        git: /home/www/sites/uri-ktk.git
+    sgf:
+        git: /home/www/sites/uri-sgf.git
+    jsk:
+        git: /home/www/sites/uri-jsk.git
+    sgt:
+        git: /home/www/sites/uri-sgt.git
+    sxd:
+        git: /home/www/sites/uri-sxd.git
+    sgd:
+        git: /home/www/sites/uri-sgd.git
+redis:
+    host: 127.0.0.1
+    port: 6379
+    base: 2
