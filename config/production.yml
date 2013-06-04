@@ -11,6 +11,8 @@ repos:
         git: /home/www/sites/uri-sxd.git
     sgd:
         git: /home/www/sites/uri-sgd.git
+    xxd:
+        git: /home/www/sites/uri-xxd.git
 redis:
     host: 127.0.0.1
     port: 6379
