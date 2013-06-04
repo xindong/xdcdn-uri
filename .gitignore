@@ -4,3 +4,4 @@ config/*.yml
 log
 tmp/restart.txt
 .elasticbeanstalk/
+Gemfile.lock
