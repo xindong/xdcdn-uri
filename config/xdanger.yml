@@ -1,13 +1,18 @@
 repos:
     ktk:
-        git: /Users/xdanger/Sites/xdcdn.net/ktk
+        git: /Users/xdanger/Sites/xdcdn.net/uri-ktk.git
     jsk:
-        git: /Users/xdanger/Sites/xdcdn.net/jsk
+        git: /Users/xdanger/Sites/xdcdn.net/uri-jsk.git
     sgf:
-        git: /Users/xdanger/Sites/xdcdn.net/sgf
+        git: /Users/xdanger/Sites/xdcdn.net/uri-sgf.git
+    sgt:
+        git: /Users/xdanger/Sites/xdcdn.net/uri-sgt.git
+    sgd:
+        git: /Users/xdanger/Sites/xdcdn.net/uri-sgd.git
     sxd:
-        git: /Users/xdanger/Sites/xdcdn.net/sxd
+        git: /Users/xdanger/Sites/xdcdn.net/uri-sxd.git
+
 redis:
-    host: localhost
+    host: 127.0.0.1
     port: 6379
     base: 0
