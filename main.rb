@@ -22,10 +22,12 @@ enable :threaded
 
 configure :production do
     disable :show_exceptions
+    set :log_file, "#{APP_ROOT}/log/production.log"
 end
 
 configure :development do
     enable :reload_templates
+    set :log_file, "#{APP_ROOT}/log/development.log"
 end
 
 $config = YAML::load_file("#{APP_ROOT}/config/#{ENV['CONFIG_FILE']}.yml")
@@ -56,6 +58,12 @@ configure do
 end
 
 # =========================== functions ==============================
+
+def log(msg)
+    File.open(settings.log_file, 'a') do |f|
+        f.write("[#{Time.now.strftime('%Y-%m-%d %H:%M:%S')}] #{msg.inspect}\n")
+    end
+end
 
 def pack_path_hash(hash, unpack = false)
     data = []
@@ -100,7 +108,6 @@ def deflate_body(data)
                 'Vary' => 'Accept-Encoding',
                 'Content-Encoding' => 'gzip'
             body gzipped
-            logger.info gzipped.size
         end
     end
     body data

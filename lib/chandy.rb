@@ -61,7 +61,7 @@ module Chandy
         end
 
         def grit
-            @grit            
+            @grit
         end
 
         private
@@ -89,6 +89,7 @@ module Chandy
             end
             Grit::Diff.list_from_string(@grit, diff)
         end
+
     end
 
     class Error < StandardError
