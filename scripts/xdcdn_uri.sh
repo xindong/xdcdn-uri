@@ -15,6 +15,6 @@ cd /home/www/sites/$BGIT || exit 1
 
 while true; do
     nowt=`date '+[%Y-%m-%d %H:%M:%S]'`
-    cd /home/www/sites/$BGIT && echo $nowt && git fetch --all && git fetch --tags && ( if test "x$2" != "xlocal"; then rsync $RARGS ./ /mnt/uri.xdcdn.net/$BGIT/; fi )
+    cd /home/www/sites/$BGIT && echo $nowt && git fetch --all && git fetch --tags && ( if test "x$2" == "xmem"; then rsync $RARGS ./ /mnt/uri.xdcdn.net/$BGIT/; fi )
     echo "$nowt sleep 10 .........." && sleep 10
 done
