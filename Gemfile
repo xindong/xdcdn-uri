@@ -1,5 +1,5 @@
 source 'https://rubygems.org'
 
 gem 'grit'
-gem 'sinatra'
 gem 'redis'
+gem 'sinatra'
