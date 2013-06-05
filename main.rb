@@ -181,6 +181,32 @@ get '/:repo/index/:tag' do
     end
 end
 
+get '/:repo/diff/:tag1..:tag2' do
+    unpack = params[:unpack] ? true : false
+    begin
+        key = "V:Chandy:Diff:#{@repo}:#{params[:tag1]}..#{params[:tag2]}"
+        dat = nil
+        dat = $redis.get(key) unless unpack
+        if dat.nil? or dat.empty?
+            idx = $uri[@repo].diff(params[:tag1], params[:tag2])
+            dat = pack_path_hash(idx, unpack)
+            unless unpack
+                $redis.set(key, dat)
+                $redis.expire(key, 3600)
+            else
+                $redis.del(key)
+            end
+        end
+        echo_mt 'text/plain; charset=utf-8'
+        expires 3600, :public, :must_revalidate
+        deflate_body dat
+    rescue Chandy::NotFound => e
+        halt 404
+    rescue => e
+        halt 500
+    end
+end
+
 get '/:repo/files/:tag' do
     unpack = params[:unpack] ? true : false
     begin
@@ -244,32 +270,6 @@ get %r{^/([a-z]+)/load/([a-zA-Z0-9_\-\.]+)/([\w/\.]+)} do
         deflate_body blob['data']
     rescue Chandy::NotFound => e
         halt 404
-    end
-end
-
-get '/:repo/diff/:tag1..:tag2' do
-    unpack = params[:unpack] ? true : false
-    begin
-        key = "V:Chandy:Diff:#{@repo}:#{params[:tag1]}..#{params[:tag2]}"
-        dat = nil
-        dat = $redis.get(key) unless unpack
-        if dat.nil? or dat.empty?
-            idx = $uri[@repo].diff(params[:tag1], params[:tag2])
-            dat = pack_path_hash(idx, unpack)
-            unless unpack
-                $redis.set(key, dat)
-                $redis.expire(key, 3600)
-            else
-                $redis.del(key)
-            end
-        end
-        echo_mt 'text/plain; charset=utf-8'
-        expires 3600, :public, :must_revalidate
-        deflate_body dat
-    rescue Chandy::NotFound => e
-        halt 404
-    rescue => e
-        halt 500
     end
 end
 
