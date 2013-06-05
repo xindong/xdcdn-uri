@@ -57,30 +57,11 @@ configure do
     #$stdout = orig_stdout
 end
 
-# =========================== functions ==============================
+# =========================== common functions ==============================
 
 def log(msg)
     File.open(settings.log_file, 'a') do |f|
         f.write("[#{Time.now.strftime('%Y-%m-%d %H:%M:%S')}] #{msg.inspect}\n")
-    end
-end
-
-def pack_path_hash(hash, unpack = false)
-    data = []
-    hash.each { |pth, tid|
-        if unpack
-            key = Digest::SHA1.hexdigest(pth)[0,10]
-            val = tid
-        else
-            key = Digest::SHA1.digest(pth)[0,5]
-            val = [tid].pack('H*')
-        end
-        data << "#{key}#{val}"
-    }
-    if unpack
-        return data.sort.join("\n")
-    else
-        return data.sort.join("")
     end
 end
 
@@ -150,87 +131,108 @@ after do
     body '' if body.nil?
 end
 
+# =========================== app functions ==============================
+
+def pack_path_hash(hash, unpack = false)
+    data = []
+    hash.each { |pth, tid|
+        if unpack
+            key = Digest::SHA1.hexdigest(pth)[0,10]
+            val = tid
+        else
+            key = Digest::SHA1.digest(pth)[0,5]
+            val = [tid].pack('H*')
+        end
+        data << "#{key}#{val}"
+    }
+    if unpack
+        return data.sort.join("\n")
+    else
+        return data.sort.join("")
+    end
+end
+
+def do_redis
+    begin
+        yield
+    rescue Redis::InheritedError => e
+        $redis.client.reconnect
+        yield
+    end
+end
+
+def process_index(key, unpack = false)
+    dat = nil
+    unless unpack
+        do_redis { dat = $redis.get(key) }
+        return dat unless dat.nil? or dat.empty?
+    end
+    idx = yield
+    dat = pack_path_hash(idx, unpack)
+    unless unpack
+        do_redis { $redis.set(key, dat) }
+        do_redis { $redis.expire(key, 3600) }
+    else
+        # unpack 相当于一个清缓存的接口了
+        do_redis { $redis.del(key) }
+    end
+    return dat
+end
+
 # ============================ actions ==============================
 
 get '/:repo/index/:tag' do
     unpack = params[:unpack] ? true : false
+    key = "V:Chandy:Index:#{@repo}:#{params[:tag]}"
     begin
-        tag = params[:tag]
-        key = "V:Chandy:Index:#{@repo}:#{tag}"
-        dat = nil
-        dat = $redis.get(key) unless unpack
-        if dat.nil? or dat.empty?
-            idx = $uri[@repo].index(params[:tag])
-            dat = pack_path_hash(idx, unpack)
-            unless unpack
-                $redis.set(key, dat)
-                $redis.expire(key, 3600)
-            else
-                # unpack 相当于一个清缓存的接口了
-                $redis.del(key)
-            end
+        dat = process_index(key, unpack) do
+            $uri[@repo].index(params[:tag])
         end
-        echo_mt 'text/plain; charset=utf-8'
-        expires 3600, :public, :must_revalidate
-        deflate_body dat
     rescue Chandy::NotFound => e
         halt 404
     rescue => e
         log e.inspect
         halt 500
     end
+    echo_mt 'text/plain; charset=utf-8'
+    expires 3600, :public, :must_revalidate
+    deflate_body dat
 end
 
 get '/:repo/diff/:tag1..:tag2' do
     unpack = params[:unpack] ? true : false
+    key = "V:Chandy:Diff:#{@repo}:#{params[:tag1]}..#{params[:tag2]}"
     begin
-        key = "V:Chandy:Diff:#{@repo}:#{params[:tag1]}..#{params[:tag2]}"
-        dat = nil
-        dat = $redis.get(key) unless unpack
-        if dat.nil? or dat.empty?
-            idx = $uri[@repo].diff(params[:tag1], params[:tag2])
-            dat = pack_path_hash(idx, unpack)
-            unless unpack
-                $redis.set(key, dat)
-                $redis.expire(key, 3600)
-            else
-                $redis.del(key)
-            end
+        dat = process_index(key, unpack) do
+            $uri[@repo].diff(params[:tag1], params[:tag2])
         end
-        echo_mt 'text/plain; charset=utf-8'
-        expires 3600, :public, :must_revalidate
-        deflate_body dat
     rescue Chandy::NotFound => e
         halt 404
     rescue => e
+        log e.inspect
         halt 500
     end
+    echo_mt 'text/plain; charset=utf-8'
+    expires 3600, :public, :must_revalidate
+    deflate_body dat
 end
 
 get '/:repo/files/:tag' do
     unpack = params[:unpack] ? true : false
+    key = "V:Chandy:Files:#{@repo}:#{params[:tag]}"
     begin
-        tag = params[:tag]
-        key = "V:Chandy:Files:#{@repo}:#{tag}"
-        dat = nil
-        dat = $redis.get(key) unless unpack
-        if dat.nil? or dat.empty?
-            idx = $uri[@repo].all_blobs(params[:tag])
-            dat = pack_path_hash(idx, unpack)
-            unless unpack
-                $redis.set(key, dat)
-                $redis.expire(key, 3600)
-            else
-                $redis.del(key)
-            end
+        dat = process_index(key, unpack) do
+            $uri[@repo].all_blobs(params[:tag])
         end
-        echo_mt 'text/plain; charset=utf-8'
-        deflate_body dat
     rescue Chandy::NotFound => e
         halt 404
     rescue => e
+        log e.inspect
         halt 500
     end
+    echo_mt 'text/plain; charset=utf-8'
+    expires 3600, :public, :must_revalidate
+    deflate_body dat
 end
 
 get '/:repo/file/:blob_id.:ext' do
