@@ -295,3 +295,11 @@ get '/:repo/preload/:tag' do
     echo_mt "text/plain; charset=utf-8"
     data.join("\n")
 end
+
+get '/:repo/status' do
+    no_cache
+    file = "#{APP_ROOT}/log/uri_#{params[:repo]}.txt"
+    halt 404 unless File.exists?(file)
+    deflate_body File.read(file)
+end
+
