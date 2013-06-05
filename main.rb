@@ -156,7 +156,7 @@ get '/:repo/index/:tag' do
     unpack = params[:unpack] ? true : false
     begin
         tag = params[:tag]
-        key = "V:Chandy:IDX:#{@repo}:#{tag}"
+        key = "V:Chandy:Index:#{@repo}:#{tag}"
         dat = nil
         dat = $redis.get(key) unless unpack
         if dat.nil? or dat.empty?
@@ -166,6 +166,7 @@ get '/:repo/index/:tag' do
                 $redis.set(key, dat)
                 $redis.expire(key, 3600)
             else
+                # unpack 相当于一个清缓存的接口了
                 $redis.del(key)
             end
         end
@@ -175,6 +176,7 @@ get '/:repo/index/:tag' do
     rescue Chandy::NotFound => e
         halt 404
     rescue => e
+        log e.inspect
         halt 500
     end
 end
@@ -183,7 +185,7 @@ get '/:repo/files/:tag' do
     unpack = params[:unpack] ? true : false
     begin
         tag = params[:tag]
-        key = "V:Chandy:IDXAll:#{@repo}:#{tag}"
+        key = "V:Chandy:Files:#{@repo}:#{tag}"
         dat = nil
         dat = $redis.get(key) unless unpack
         if dat.nil? or dat.empty?
