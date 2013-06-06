@@ -1,0 +1,16 @@
+[program:uri_sxd]
+command=/home/www/sites/uri.xdcdn.net/scripts/fetch-repo sxd
+directory=/home/www/scripts
+autostart=true
+startretries=10
+exitcodes=0
+stopsignal=INT
+stopwaitsecs=10
+user=www
+group=www
+redirect_stderr=true
+stdout_logfile=/home/www/sites/uri.xdcdn.net/log/uri_sxd.txt
+stdout_logfile_maxbytes=1MB
+stdout_logfile_backups=10
+environment=
+

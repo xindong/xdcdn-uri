@@ -1,0 +1,16 @@
+[program:uri_xxd]
+command=/home/www/sites/uri.xdcdn.net/scripts/fetch-repo xxd
+directory=/home/www/scripts
+autostart=true
+startretries=10
+exitcodes=0
+stopsignal=INT
+stopwaitsecs=10
+user=www
+group=www
+redirect_stderr=true
+stdout_logfile=/home/www/sites/uri.xdcdn.net/log/uri_xxd.txt
+stdout_logfile_maxbytes=1MB
+stdout_logfile_backups=10
+environment=
+
