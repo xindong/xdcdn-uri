@@ -1,5 +1,5 @@
 [program:uri_sgd]
-command=./scripts/fetch-repo sgd
+command=/home/www/sites/uri.xdcdn.net/scripts/fetch-repo sgd
 directory=/home/www/sites/uri.xdcdn.net
 autostart=true
 startretries=10
@@ -9,7 +9,7 @@ stopwaitsecs=10
 user=www
 group=www
 redirect_stderr=true
-stdout_logfile=./log/uri_sgd.txt
+stdout_logfile=/home/www/sites/uri.xdcdn.net/log/uri_sgd.txt
 stdout_logfile_maxbytes=1MB
 stdout_logfile_backups=10
 environment=
