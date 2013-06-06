@@ -1,7 +1,7 @@
 [program:uri_sgd]
 command=/home/www/sites/uri.xdcdn.net/scripts/fetch-repo sgd
 directory=/home/www/scripts
-autostart=false
+autostart=true
 startretries=10
 exitcodes=0
 stopsignal=INT
