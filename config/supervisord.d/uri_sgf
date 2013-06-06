@@ -1,6 +1,6 @@
 [program:uri_sgf]
-command=/home/www/sites/uri.xdcdn.net/scripts/fetch-repo sgf
-directory=/home/www/scripts
+command=./scripts/fetch-repo sgf
+directory=/home/www/sites/uri.xdcdn.net
 autostart=true
 startretries=10
 exitcodes=0
@@ -9,7 +9,7 @@ stopwaitsecs=10
 user=www
 group=www
 redirect_stderr=true
-stdout_logfile=/home/www/sites/uri.xdcdn.net/log/uri_sgf.txt
+stdout_logfile=./log/uri_sgf.txt
 stdout_logfile_maxbytes=1MB
 stdout_logfile_backups=10
 environment=
