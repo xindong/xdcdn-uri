@@ -1,5 +1,5 @@
 [program:uri_jsk]
-command=./scripts/fetch-repo jsk
+command=scripts/fetch-repo jsk
 directory=/home/www/sites/uri.xdcdn.net
 autostart=true
 startretries=10
@@ -9,8 +9,7 @@ stopwaitsecs=10
 user=www
 group=www
 redirect_stderr=true
-stdout_logfile=./log/uri_jsk.txt
+stdout_logfile=log/uri_jsk.txt
 stdout_logfile_maxbytes=1MB
 stdout_logfile_backups=10
 environment=
-
