@@ -14,7 +14,7 @@ repos:
     xxd:
         git: /home/www/sites/uri-xxd.git
     syk:
-        git: /home/www/sites/uri-sky.git
+        git: /home/www/sites/uri-syk.git
 redis:
     host: 127.0.0.1
     port: 6379
