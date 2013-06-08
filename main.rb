@@ -245,10 +245,10 @@ get '/:repo/file/:blob_id.:ext' do
     end
 end
 
-get '/:repo/file/:blob_id/:filename.:ext' do
+get '/:repo/file/:blob_id/:filename' do
     begin
         blob = $uri[@repo].file(:blob_id => params[:blob_id])
-        echo_mt params[:ext]
+        echo_mt blob['mime_type']
         deflate_body blob['data']
     rescue Chandy::NotFound => e
         halt 404
