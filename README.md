@@ -55,10 +55,10 @@
     - last_tag: "20130604C"
   3. 客户端拼凑2个索引文件 URL（索引文件 CDN 缓存 **1小时**）
     - http://uri.xdcdn.net/ktk/index/20120825A
-    - http://uri.xdcdn.net/ktk/diff/20130604C
+    - http://uri.xdcdn.net/ktk/diff/20120825A..20130604C
   4. 加载这2个索引文件，分别解析后存在2个 Hash 类型变量中，其中
     - $idxHash: 将加载到的 http://uri.xdcdn.net/ktk/index/20120825A 的数据以25个字节为一组切开，前5个字节为键名，后20个字节为键值
-    - $dffHash: 将加载到的 http://uri.xdcdn.net/ktk/diff/20130604C 的数据以25个字节为一组切开，前5个字节为键名，后20个字节为键值
+    - $dffHash: 将加载到的 http://uri.xdcdn.net/ktk/diff/20120825A..20130604C 的数据以25个字节为一组切开，前5个字节为键名，后20个字节为键值
   5. 封装读取资源的接口，以如下方式拼凑 URL（假设需要加载 assets/TeamBossIMG/4257.jpg ）
     1. $key = substr(sha1('assets/TeamBossIMG/4257.jpg', true), 0, 5); 用 $key 到 $dffHash 里查找是否有对应的键值 $val
     2. 如果有，则直接拼凑下载地址 http://uri.xdcdn.net/ktk/file/$val/4257.jpg
