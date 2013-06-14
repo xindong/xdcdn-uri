@@ -1,7 +1,8 @@
 .DS_Store
 !.gitignore
-log/*.log
-log/*.txt
-tmp/restart.txt
-.elasticbeanstalk/
-Gemfile.lock
+/log/*.log
+/log/*.txt
+/log/*.txt.*
+/tmp/restart.txt
+/.elasticbeanstalk/
+/Gemfile.lock
