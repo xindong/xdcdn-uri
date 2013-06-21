@@ -10,6 +10,7 @@ require 'zlib'
 require 'yaml'
 require 'time'
 require 'pp'
+require 'newrelic_rpm'
 
 # =========================== configurations =========================
 
