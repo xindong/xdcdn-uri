@@ -290,7 +290,7 @@ get '/:repo/preload/:tag' do
     $uri[@repo].index(params[:tag]).each { |dir, tid|
         $uri[@repo].grit.tree(tid).blobs.each { |b|
             data << "http://#{request.host}/#{params[:repo]}/tree/#{tid}/#{b.basename}"
-            data << "http://#{request.host}/#{params[:repo]}/file/#{b.id}/#{b.basename}"
+            #data << "http://#{request.host}/#{params[:repo]}/file/#{b.id}/#{b.basename}"
         }
     }
     echo_mt "text/plain; charset=utf-8"
