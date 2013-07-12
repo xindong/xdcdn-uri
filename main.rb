@@ -302,6 +302,7 @@ get '/:repo/status' do
     echo_mt 'text/plain; charset=utf-8'
     file = "#{APP_ROOT}/log/uri_#{params[:repo]}.txt"
     halt 404 unless File.exists?(file)
-    deflate_body File.read(file)
+    text = `tail -n 200 #{file}`
+    deflate_body text
 end
 
