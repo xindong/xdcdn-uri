@@ -250,7 +250,7 @@ get '/:repo/file/:blob_id/:filename' do
     begin
         blob = $uri[@repo].file(:blob_id => params[:blob_id])
         if params[:repo] == 'xxd'
-            log("#{params[:blob_id]}/#{params[:filename]} : #{blob['size']}")
+            log("#{params[:blob_id]}/#{params[:filename]} : #{blob['bytes']}")
         end
         echo_mt blob['mime_type']
         deflate_body blob['data']
