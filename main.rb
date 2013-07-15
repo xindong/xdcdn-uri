@@ -249,6 +249,7 @@ end
 get '/:repo/file/:blob_id/:filename' do
     begin
         blob = $uri[@repo].file(:blob_id => params[:blob_id])
+        log("/#{params[:repo]}/file/#{params[:blob_id]}/#{params[:filename]} : #{blob['bytes']}")
         echo_mt blob['mime_type']
         deflate_body blob['data']
     rescue Chandy::NotFound => e

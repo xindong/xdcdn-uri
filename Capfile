@@ -25,7 +25,7 @@ namespace :a2 do
 
     task :status, :roles => :nodes_clt, :except => { :type => 'production' } do
         run "tail -n 10 /home/www/sites/uri.xdcdn.net/log/*.txt"
-        run "supervisorctl status"
+        run "tail -n 10  /home/www/sites/uri.xdcdn.net/log/production.log"
     end
     
 end
@@ -52,7 +52,7 @@ namespace :pd do
 
     task :status, :roles => :nodes_clt, :except => { :type => 'testing' } do
         run "tail -n 10  /home/www/sites/uri.xdcdn.net/log/*.txt"
-        run "supervisorctl status"
+        run "tail -n 10  /home/www/sites/uri.xdcdn.net/log/production.log"
     end
     
 end
