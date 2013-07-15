@@ -29,7 +29,7 @@ Host uri-sgt
 	ConnectTimeout 30
 
 Host uri-sxd
-	HostName hub009.xindong.com
+	HostName hub.xindong.com
 	IdentityFile /home/www/sites/uri.xdcdn.net/config/ssh-keys/uri_sxd
 	ConnectTimeout 30
 
