@@ -11,7 +11,10 @@ repos:
         git: /Users/xdanger/Sites/xdcdn.net/uri-sgd.git
     sxd:
         git: /Users/xdanger/Sites/xdcdn.net/uri-sxd.git
-
+    xxd:
+        git: /Users/xdanger/Sites/xdcdn.net/uri-xxd.git
+    syk:
+        git: /Users/xdanger/Sites/xdcdn.net/uri-syk.git
 redis:
     host: 127.0.0.1
     port: 6379

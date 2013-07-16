@@ -12,6 +12,7 @@ module Chandy
 
         def initialize(repo_dir)
             begin
+                @repo = File.basename(repo_dir)
                 @grit = Grit::Repo.new(repo_dir)
             rescue => e
                 raise Chandy::Error, e.message
@@ -30,13 +31,13 @@ module Chandy
             blob = nil
             if args.has_key? :blob_id
                 blob = @grit.blob(args[:blob_id])
-                raise Chandy::NotFound, "blob_id: #{args[:blob_id]} not found" if blob.nil?
+                raise Chandy::NotFound, "#{@repo} / blob: #{args[:blob_id]} not found" if blob.nil?
             elsif args.has_key? :tree_id and args.has_key? :filename
                 blob = @grit.tree(args[:tree_id]) / args[:filename]
-                raise Chandy::NotFound, "#{args[:tree_id]}/#{args[:filename]} not found" if blob.nil?
+                raise Chandy::NotFound, "#{@repo} / #{args[:tree_id]}/#{args[:filename]} not found" if blob.nil?
             elsif args.has_key? :tag and args.has_key? :path
                 blob = root_tree_of(args[:tag]) / args[:path]
-                raise Chandy::NotFound, "#{args[:path]}@#{args[:tag]} not found" if blob.nil?
+                raise Chandy::NotFound, "#{@repo} / #{args[:path]}@#{args[:tag]} not found" if blob.nil?
             else
                 raise Chandy::NotFound, "invalid args"
             end
@@ -68,7 +69,8 @@ module Chandy
 
         def root_tree_of(ref)
             head = @grit.commits(ref, 1)
-            raise Chandy::NotFound, "ref: #{ref} not found" if head.size == 0
+            raise Chandy::NotFound, "#{@grit.git.rev_list({ :pretty => "raw" }, '2013071605')}"
+            raise Chandy::NotFound, "#{@repo} / ref: #{ref} not found" if head.size == 0
             return head.first.tree
         end
 
