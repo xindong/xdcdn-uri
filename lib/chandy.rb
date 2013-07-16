@@ -69,7 +69,6 @@ module Chandy
 
         def root_tree_of(ref)
             head = @grit.commits(ref, 1)
-            raise Chandy::NotFound, "#{@grit.git.rev_list({ :pretty => "raw" }, '2013071605')}"
             raise Chandy::NotFound, "#{@repo} / ref: #{ref} not found" if head.size == 0
             return head.first.tree
         end
