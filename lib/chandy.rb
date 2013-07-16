@@ -68,7 +68,7 @@ module Chandy
 
         def root_tree_of(ref)
             head = @grit.commits(ref, 1)
-            raise Chandy::NotFound, "#{ref} not found" if head.size == 0
+            raise Chandy::NotFound, "ref: #{ref} not found" if head.size == 0
             return head.first.tree
         end
 

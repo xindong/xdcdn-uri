@@ -190,6 +190,7 @@ get '/:repo/index/:tag' do
             $uri[@repo].index(params[:tag])
         end
     rescue Chandy::NotFound => e
+        log e.reason
         halt 404
     rescue => e
         log e.inspect
@@ -208,6 +209,7 @@ get '/:repo/diff/:tag1..:tag2' do
             $uri[@repo].diff(params[:tag1], params[:tag2])
         end
     rescue Chandy::NotFound => e
+        log e.reason
         halt 404
     rescue => e
         log e.inspect
@@ -226,6 +228,7 @@ get '/:repo/files/:tag' do
             $uri[@repo].all_blobs(params[:tag])
         end
     rescue Chandy::NotFound => e
+        log e.reason
         halt 404
     rescue => e
         log e.inspect
@@ -242,6 +245,7 @@ get '/:repo/file/:blob_id.:ext' do
         echo_mt params[:ext]
         deflate_body blob['data']
     rescue Chandy::NotFound => e
+        log e.reason
         halt 404
     end
 end
@@ -253,6 +257,7 @@ get '/:repo/file/:blob_id/:filename' do
         echo_mt blob['mime_type']
         deflate_body blob['data']
     rescue Chandy::NotFound => e
+        log e.reason
         halt 404
     end
 end
@@ -263,6 +268,7 @@ get '/:repo/tree/:tree/:file' do
         echo_mt blob['mime_type']
         deflate_body blob['data']
     rescue Chandy::NotFound => e
+        log e.reason
         halt 404
     end
 end
@@ -273,6 +279,7 @@ get %r{^/([a-z]+)/load/([a-zA-Z0-9_\-\.]+)/([\w/\.]+)} do
         echo_mt blob['mime_type']
         deflate_body blob['data']
     rescue Chandy::NotFound => e
+        log e.reason
         halt 404
     end
 end
