@@ -250,11 +250,11 @@ get '/:repo/file/:blob_id.:ext' do
     end
 end
 
-get '/:repo/file/:blob_id/:filename' do
+get '/:repo/file/:blob_id/:file' do
     begin
         blob = $uri[@repo].file(:blob_id => params[:blob_id])
-        log("/#{params[:repo]}/file/#{params[:blob_id]}/#{params[:filename]} : #{blob['bytes']}")
-        echo_mt blob['mime_type']
+        log("/#{params[:repo]}/file/#{params[:blob_id]}/#{params[:file]} : #{blob['bytes']}")
+        echo_mt File.extname(params[:file])
         deflate_body blob['data']
     rescue Chandy::NotFound => e
         log e.reason
@@ -265,7 +265,7 @@ end
 get '/:repo/tree/:tree/:file' do
     begin
         blob = $uri[@repo].file(:tree_id => params[:tree], :filename => params[:file])
-        echo_mt blob['mime_type']
+        echo_mt File.extname(params[:file])
         deflate_body blob['data']
     rescue Chandy::NotFound => e
         log e.reason
@@ -276,7 +276,7 @@ end
 get %r{^/([a-z]+)/load/([a-zA-Z0-9_\-\.]+)/([\w/\.]+)} do
     begin
         blob = $uri[@repo].file(:tag => params[:captures][1], :path => params[:captures][2])
-        echo_mt blob['mime_type']
+        echo_mt File.extname(params[:captures][2])
         deflate_body blob['data']
     rescue Chandy::NotFound => e
         log e.reason
