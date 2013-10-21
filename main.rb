@@ -98,6 +98,9 @@ end
 # =========================== hooks =================================
 
 error 404 do
+    key = "V:Chandy:NotFound:#{request.path_info}"
+    do_redis { $redis.set(key, "1") }
+    do_redis { $redis.expire(key, 60) }
     no_cache
     echo_mt 'text/plain; charset=utf-8'
     body "404
@@ -120,6 +123,10 @@ error do halt 500 end
 before do
     @repo = request.path_info.split('/')[1]
     halt 404 if $uri[@repo].nil?
+    dat = nil
+    key = "V:Chandy:NotFound:#{request.path_info}"
+    do_redis { dat = $redis.get(key) }
+    halt 404 unless dat.nil?
     # 默认缓存1年
     headers \
         'Date' => Time.now.rfc2822,
