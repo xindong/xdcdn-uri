@@ -321,3 +321,13 @@ get '/:repo/status' do
     deflate_body text
 end
 
+get '/:repo/404' do
+    no_cache
+    echo_mt 'text/plain; charset=utf-8'
+    klist = nil
+    urls = []
+    do_redis { klist = $redis.keys("V:Chandy:NotFound:/#{params[:repo]}/*") }
+    klist.each { |key| urls << key.gsub(/^V:Chandy:NotFound:/, '') }
+    deflate_body urls.join("\n")
+end
+
