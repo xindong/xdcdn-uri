@@ -80,6 +80,7 @@ def echo_mt(mt)
 end
 
 def deflate_body(data)
+    no_cache if data.nil? or data.empty?
     body data and return
     if env['HTTP_ACCEPT_ENCODING'].nil? or data.size < 10000
         body data
@@ -136,10 +137,7 @@ before do
 end
 
 after do
-    if body.nil? or body.empty?
-        no_cache
-        body ''
-    end
+    body '' if body.nil?
 end
 
 # =========================== app functions ==============================
