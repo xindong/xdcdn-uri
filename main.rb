@@ -136,7 +136,7 @@ before do
 end
 
 after do
-    if body.nil? or body.empty? do
+    if body.nil? or body.empty?
         no_cache
         body ''
     end
