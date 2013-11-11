@@ -136,7 +136,10 @@ before do
 end
 
 after do
-    body '' if body.nil?
+    if body.nil? or body.empty? do
+        no_cache
+        body ''
+    end
 end
 
 # =========================== app functions ==============================
