@@ -1,5 +1,5 @@
 [program:uri_sgf]
-command=/home/www/sites/uri.xdcdn.net/scripts/fetch-repo sgf
+command=/home/www/sites/uri.xdcdn.net/scripts/update-repo sgf
 directory=/home/www/sites/uri.xdcdn.net
 autostart=true
 startretries=10

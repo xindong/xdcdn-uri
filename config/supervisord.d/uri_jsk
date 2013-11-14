@@ -1,5 +1,5 @@
 [program:uri_jsk]
-command=/home/www/sites/uri.xdcdn.net/scripts/fetch-repo jsk
+command=/home/www/sites/uri.xdcdn.net/scripts/update-repo jsk
 directory=/home/www/sites/uri.xdcdn.net
 autostart=true
 startretries=10

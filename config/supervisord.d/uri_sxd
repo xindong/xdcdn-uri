@@ -1,5 +1,5 @@
 [program:uri_sxd]
-command=/home/www/sites/uri.xdcdn.net/scripts/fetch-repo sxd
+command=/home/www/sites/uri.xdcdn.net/scripts/update-repo sxd
 directory=/home/www/sites/uri.xdcdn.net
 autostart=true
 startretries=10

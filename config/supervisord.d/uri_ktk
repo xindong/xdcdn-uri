@@ -1,5 +1,5 @@
 [program:uri_ktk]
-command=/home/www/sites/uri.xdcdn.net/scripts/fetch-repo ktk
+command=/home/www/sites/uri.xdcdn.net/scripts/update-repo ktk
 directory=/home/www/sites/uri.xdcdn.net
 autostart=true
 startretries=10

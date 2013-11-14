@@ -1,0 +1,8 @@
+ast_repo="git@hub.xindong.com:xdanger/uri-ast.git"
+ktk_repo="git@hub.xindong.com:xdanger/uri-ktk.git"
+jsk_repo="git@hub.xindong.com:xdanger/uri-jsk.git"
+sgf_repo="git@hub.xindong.com:xdanger/uri-sgf.git"
+sgd_repo="git@hub.xindong.com:xdanger/uri-sgd.git"
+sxd_repo="git@hub.xindong.com:xdanger/uri-sxd.git"
+xxd_repo="git@hub.xindong.com:xdanger/uri-xxd.git"
+syk_repo="git@hub.xindong.com:xdanger/uri-syk.git"
