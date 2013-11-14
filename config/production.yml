@@ -1,4 +1,6 @@
 repos:
+    ast:
+        git: /home/www/sites/uri-ast.git
     ktk:
         git: /home/www/sites/uri-ktk.git
     sgf:
