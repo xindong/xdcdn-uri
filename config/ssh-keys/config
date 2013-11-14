@@ -14,9 +14,14 @@ Host xdcdn-uri
 	ConnectTimeout 30
 
 Host uri-sgf
-	HostName hub005.xindong.com
+	HostName hub.xindong.com
 	IdentityFile /home/www/sites/uri.xdcdn.net/config/ssh-keys/uri_sgf
 	ConnectTimeout 30
+
+Host uri-sgd
+    HostName hub.xindong.com
+    IdentityFile /home/www/sites/uri.xdcdn.net/config/ssh-keys/uri_sgd
+    ConnectTimeout 30
 
 Host uri-ktk
 	HostName hub.xindong.com
@@ -28,19 +33,9 @@ Host uri-jsk
 	IdentityFile /home/www/sites/uri.xdcdn.net/config/ssh-keys/uri_jsk
 	ConnectTimeout 30
 
-Host uri-sgt
-	HostName hub005.xindong.com
-	IdentityFile /home/www/sites/uri.xdcdn.net/config/ssh-keys/uri_sgt
-	ConnectTimeout 30
-
 Host uri-sxd
 	HostName hub.xindong.com
 	IdentityFile /home/www/sites/uri.xdcdn.net/config/ssh-keys/uri_sxd
-	ConnectTimeout 30
-
-Host uri-sgd
-	HostName hub005.xindong.com
-	IdentityFile /home/www/sites/uri.xdcdn.net/config/ssh-keys/uri_sgd
 	ConnectTimeout 30
 
 Host uri-xxd
