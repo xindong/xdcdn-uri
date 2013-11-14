@@ -3,14 +3,12 @@ repos:
         git: /home/www/sites/uri-ktk.git
     sgf:
         git: /home/www/sites/uri-sgf.git
-    jsk:
-        git: /home/www/sites/uri-jsk.git
-    sgt:
-        git: /home/www/sites/uri-sgt.git
-    sxd:
-        git: /home/www/sites/uri-sxd.git
     sgd:
         git: /home/www/sites/uri-sgd.git
+    jsk:
+        git: /home/www/sites/uri-jsk.git
+    sxd:
+        git: /home/www/sites/uri-sxd.git
     xxd:
         git: /home/www/sites/uri-xxd.git
     syk:
