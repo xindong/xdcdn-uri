@@ -1,11 +1,16 @@
+Host admin-js
+    HostName hub007.xindong.com
+    IdentityFile /home/www/.ssh/admin_js
+    ConnectTimeout 30
+
+Host admin-lib
+    HostName hub007.xindong.com
+    IdentityFile /home/www/.ssh/admin_lib
+    ConnectTimeout 30
+
 Host xdcdn-uri
 	HostName hub.xindong.com
 	IdentityFile /home/www/sites/uri.xdcdn.net/config/ssh-keys/xdcdn_uri
-	ConnectTimeout 30
-
-Host uri-sgk
-	HostName hub005.xindong.com
-	IdentityFile /home/www/sites/uri.xdcdn.net/config/ssh-keys/uri_sgk
 	ConnectTimeout 30
 
 Host uri-sgf
