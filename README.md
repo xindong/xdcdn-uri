@@ -63,6 +63,6 @@
   5. 封装读取资源的接口，以如下方式拼凑 URL（假设需要加载 assets/TeamBossIMG/4257.jpg ）
     1. $key = substr(sha1('assets/TeamBossIMG/4257.jpg', true), 0, 5); 用 $key 到 $dffHash 里查找是否有对应的键值 $val
     2. 如果有，则直接拼凑下载地址 http://uri.xdcdn.net/ktk/file/$val/4257.jpg
-    3. 如果没，则 $key = substr(sha1(dirname('assets/TeamBossIMG.jpg'), true), 0, 5); 用 $key 到 $idxHash 里查找是否有对应的键值 $val，没有则出错了，有的话拼凑下载地址 http://uri.xdcdn.net/ktk/tree/$val/4257.jpg
+    3. 如果没，则 $key = substr(sha1(dirname('assets/TeamBossIMG'), true), 0, 5); 用 $key 到 $idxHash 里查找是否有对应的键值 $val，没有则出错了，有的话拼凑下载地址 http://uri.xdcdn.net/ktk/tree/$val/4257.jpg
     4. 如果是根目录下文件，目录名取 '.'，$key = substr(sha1('.', true), 0, 5)，如根目录下 Main.swf: <http://uri.xdcdn.net/ktk/tree/6234ab487915f9bf2cd287a67b44481d627001b8dce8e/Main.swf>
 
