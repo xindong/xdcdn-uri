@@ -45,6 +45,10 @@ module Chandy
         end
 
         def diff(tag1, tag2)
+            [tag1, tag2].each do |ref|
+                head = @grit.commits(ref, 1)
+                raise Chandy::NotFound, "#{@repo} / ref: #{ref} not found" if head.size == 0
+            end
             diffs = []
             native_diff(tag1, tag2).each do |diff|
                 next if diff.b_path.nil? or diff.b_blob.nil? or diff.b_blob.id.nil?
