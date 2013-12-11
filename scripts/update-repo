@@ -17,8 +17,10 @@ while true; do
     nowt=`date '+[%Y-%m-%d %H:%M:%S]'`
     cd /home/www/sites/$BGIT && echo $nowt && git remote update && ( if test "x$2" == "xmem"; then rsync $RARGS ./ /mnt/uri.xdcdn.net/$BGIT/; fi )
     objs=`ls -l objects | wc -l | xargs`
-    if [ $objs -gt 10 ]; then
-        echo "git gc ..." && git gc
+    if [ $objs -gt 16 ]; then
+        if [ `date '+%H'` == "02" ]; then
+            echo "git gc ..." && git gc
+        fi
     else
         echo "$nowt sleep 10 .........." && sleep 10
     fi
