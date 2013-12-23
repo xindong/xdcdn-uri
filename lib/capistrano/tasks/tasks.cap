@@ -1,0 +1,27 @@
+task :update_supervisor do
+    on roles(:nodes_ctl) do |host|
+        execute "supervisorctl update"
+    end
+end
+
+task :link do
+    on roles(:nodes_www) do |host|
+        execute "ln -sf /home/www/sites/uri.xdcdn.net/config/ssh-keys/config /home/www/.ssh/config && \
+                 ln -sf /home/www/sites/uri.xdcdn.net/config/supervisord.conf /etc/"
+    end
+end
+
+task :release do
+    on roles(:nodes_www) do
+        execute "cd /home/www/sites/uri.xdcdn.net \
+                 && git pull \
+                 && chmod 0600 config/ssh-keys/*\
+                 && touch /home/www/sites/uri.xdcdn.net/tmp/restart.txt"
+    end
+end
+
+task :status do
+    on roles(:nodes_www) do
+        execute "tail -n 10 /home/www/sites/uri.xdcdn.net/log/*.txt"
+    end
+end
