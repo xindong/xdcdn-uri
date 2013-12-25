@@ -21,7 +21,6 @@ while true; do
         if [ `date '+%H'` == "02" ]; then
             echo "git gc ..." && git gc
         fi
-    else
-        echo "$nowt sleep 10 .........." && sleep 10
     fi
+    echo "$nowt sleep 10 .........." && sleep 10
 done
