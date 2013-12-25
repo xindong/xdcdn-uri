@@ -16,6 +16,7 @@ repos:
     syk:
         git: /home/www/sites/uri-syk.git
 redis:
-    host: 127.0.0.1
+    host: redis.uri.xdcdn.net
     port: 6379
     base: 2
+
