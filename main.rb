@@ -81,24 +81,24 @@ end
 
 def deflate_body(data)
     no_cache if data.nil? or data.empty?
-    if params[:onlysize]
-        body data.size
+    if params[:sizeonly]
+        body data.size.to_s
     else
         body data
     end
     return
-    if env['HTTP_ACCEPT_ENCODING'].nil? or data.size < 10000
-        body data
-    elsif env['HTTP_ACCEPT_ENCODING'].split(",").include? 'deflate'
-        gzipped = Zlib::Deflate.deflate(data, 9)
-        if gzipped.size < data.size * 0.8
-            headers \
-                'Vary' => 'Accept-Encoding',
-                'Content-Encoding' => 'gzip'
-            body gzipped
-        end
-    end
-    body data
+    # if env['HTTP_ACCEPT_ENCODING'].nil? or data.size < 10000
+    #     body data
+    # elsif env['HTTP_ACCEPT_ENCODING'].split(",").include? 'deflate'
+    #     gzipped = Zlib::Deflate.deflate(data, 9)
+    #     if gzipped.size < data.size * 0.8
+    #         headers \
+    #             'Vary' => 'Accept-Encoding',
+    #             'Content-Encoding' => 'gzip'
+    #         body gzipped
+    #     end
+    # end
+    # body data
 end
 
 # =========================== hooks =================================
