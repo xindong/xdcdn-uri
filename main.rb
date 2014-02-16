@@ -132,7 +132,8 @@ before do
     headers \
         'Date' => Time.now.rfc2822,
         'Last-Modified' => Time.now.rfc2822,
-        'X-Response-On' => Time.now.to_s
+        'X-Response-On' => Time.now.to_s,
+        'Access-Control-Allow-Origin' => '*'
     expires 31536000
 end
 
