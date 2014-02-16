@@ -191,7 +191,7 @@ end
 # ============================ actions ==============================
 
 get '/:repo/index/:tag' do
-    unpack = params[:unpack] ? true : false
+    unpack = params[:unpack].nil? ? false : true
     key = "V:Chandy:Index:#{@repo}:#{params[:tag]}"
     begin
         dat = process_index(key, unpack) do
@@ -210,7 +210,7 @@ get '/:repo/index/:tag' do
 end
 
 get '/:repo/diff/:tag1..:tag2' do
-    unpack = params[:unpack] ? true : false
+    unpack = params[:unpack].nil? ? false : true
     key = "V:Chandy:Diff:#{@repo}:#{params[:tag1]}..#{params[:tag2]}"
     begin
         dat = process_index(key, unpack) do
@@ -229,7 +229,7 @@ get '/:repo/diff/:tag1..:tag2' do
 end
 
 get '/:repo/files/:tag' do
-    unpack = params[:unpack] ? true : false
+    unpack = params[:unpack].nil? ? false : true
     key = "V:Chandy:Files:#{@repo}:#{params[:tag]}"
     begin
         dat = process_index(key, unpack) do
