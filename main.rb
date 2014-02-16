@@ -81,7 +81,12 @@ end
 
 def deflate_body(data)
     no_cache if data.nil? or data.empty?
-    body data and return
+    if params[:onlysize]
+        body data.size
+    else
+        body data
+    end
+    return
     if env['HTTP_ACCEPT_ENCODING'].nil? or data.size < 10000
         body data
     elsif env['HTTP_ACCEPT_ENCODING'].split(",").include? 'deflate'
