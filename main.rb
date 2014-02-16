@@ -132,8 +132,7 @@ before do
     headers \
         'Date' => Time.now.rfc2822,
         'Last-Modified' => Time.now.rfc2822,
-        'X-Response-On' => Time.now.to_s,
-        'Access-Control-Allow-Origin' => '*'
+        'X-Response-On' => Time.now.to_s
     expires 31536000
 end
 
@@ -192,7 +191,7 @@ end
 # ============================ actions ==============================
 
 get '/:repo/index/:tag' do
-    unpack = (!params.keys.include?(:unpack) and params[:unpack].nil?) ? false : true
+    unpack = params[:unpack] ? true : false
     key = "V:Chandy:Index:#{@repo}:#{params[:tag]}"
     begin
         dat = process_index(key, unpack) do
@@ -211,7 +210,7 @@ get '/:repo/index/:tag' do
 end
 
 get '/:repo/diff/:tag1..:tag2' do
-    unpack = (!params.keys.include?(:unpack) and params[:unpack].nil?) ? false : true
+    unpack = params[:unpack] ? true : false
     key = "V:Chandy:Diff:#{@repo}:#{params[:tag1]}..#{params[:tag2]}"
     begin
         dat = process_index(key, unpack) do
@@ -230,7 +229,7 @@ get '/:repo/diff/:tag1..:tag2' do
 end
 
 get '/:repo/files/:tag' do
-    unpack = (!params.keys.include?(:unpack) and params[:unpack].nil?) ? false : true
+    unpack = params[:unpack] ? true : false
     key = "V:Chandy:Files:#{@repo}:#{params[:tag]}"
     begin
         dat = process_index(key, unpack) do
