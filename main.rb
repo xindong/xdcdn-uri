@@ -85,9 +85,17 @@ def echo_body(data)
     if params[:sizeonly]
         body data.size.to_s
     elsif params[:callback]
-        body data.to_json
+        if data.class == Array
+            body data.to_json
+        else
+            body [data].to_json
+        end
     else
-        body data
+        if data.class == Array
+            body data.join("\n")
+        else
+            body data
+        end
     end
     return
     # if env['HTTP_ACCEPT_ENCODING'].nil? or data.size < 10000
@@ -255,6 +263,37 @@ get '/:repo/files/:tag' do
     echo_body dat
 end
 
+get '/:repo/preload/:tag1..:tag2' do
+    data = []
+    $uri[@repo].diff(params[:tag1], params[:tag2]).each { |path, blob|
+        data << "http://#{request.host}/#{params[:repo]}/file/#{blob}/#{File.basename(path)}"
+    }
+    echo_mt "text/plain; charset=utf-8"
+    echo_body data
+end
+
+get '/:repo/preload/:tag' do
+    data = []
+    $uri[@repo].index(params[:tag]).each { |dir, tid|
+        $uri[@repo].grit.tree(tid).blobs.each { |b|
+            data << "http://#{request.host}/#{params[:repo]}/tree/#{tid}/#{b.basename}"
+            #data << "http://#{request.host}/#{params[:repo]}/file/#{b.id}/#{b.basename}"
+        }
+    }
+    echo_mt "text/plain; charset=utf-8"
+    echo_body data
+end
+
+get '/:repo/404' do
+    no_cache
+    echo_mt 'text/plain; charset=utf-8'
+    klist = nil
+    urls = []
+    do_redis { klist = $redis.keys("V:Chandy:NotFound:/#{params[:repo]}/*") }
+    klist.each { |key| urls << key.gsub(/^V:Chandy:NotFound:/, '') }
+    echo_body urls
+end
+
 get '/:repo/file/:blob_id.:ext' do
     begin
         blob = $uri[@repo].file(:blob_id => params[:blob_id])
@@ -300,27 +339,6 @@ get %r{^/([a-z]+)/load/([a-zA-Z0-9_\-\.]+)/(\S+)} do
     end
 end
 
-get '/:repo/preload/:tag1..:tag2' do
-    data = []
-    $uri[@repo].diff(params[:tag1], params[:tag2]).each { |path, blob|
-        data << "http://#{request.host}/#{params[:repo]}/file/#{blob}/#{File.basename(path)}"
-    }
-    echo_mt "text/plain; charset=utf-8"
-    echo_body data.join("\n")
-end
-
-get '/:repo/preload/:tag' do
-    data = []
-    $uri[@repo].index(params[:tag]).each { |dir, tid|
-        $uri[@repo].grit.tree(tid).blobs.each { |b|
-            data << "http://#{request.host}/#{params[:repo]}/tree/#{tid}/#{b.basename}"
-            #data << "http://#{request.host}/#{params[:repo]}/file/#{b.id}/#{b.basename}"
-        }
-    }
-    echo_mt "text/plain; charset=utf-8"
-    echo_body data.join("\n")
-end
-
 get '/:repo/status' do
     no_cache
     echo_mt 'text/plain; charset=utf-8'
@@ -330,13 +348,5 @@ get '/:repo/status' do
     echo_body text
 end
 
-get '/:repo/404' do
-    no_cache
-    echo_mt 'text/plain; charset=utf-8'
-    klist = nil
-    urls = []
-    do_redis { klist = $redis.keys("V:Chandy:NotFound:/#{params[:repo]}/*") }
-    klist.each { |key| urls << key.gsub(/^V:Chandy:NotFound:/, '') }
-    echo_body urls.join("\n")
-end
+
 
