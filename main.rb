@@ -82,10 +82,12 @@ end
 
 def echo_body(data)
     no_cache if data.nil? or data.empty?
-    if params[:sizeonly]
-        body data.size.to_s
-    elsif params[:callback]
-        body "#{params[:callback]}(#{data.to_json})"
+    if params[:callback]
+        if params[:sizeonly]
+            body "#{params[:callback]}(#{data.size})"
+        else
+            body "#{params[:callback]}(#{data.to_json})"
+        end
     else
         if data.class == Array
             body data.join("\n")
