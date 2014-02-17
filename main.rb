@@ -88,7 +88,7 @@ def echo_body(data)
         if data.class == Array
             body data.to_json
         else
-            body [data].to_json
+            body "#{params[:callback]}(#{data.to_json})"
         end
     else
         if data.class == Array
