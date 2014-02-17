@@ -8,6 +8,7 @@ require 'chandy'
 require 'redis'
 require 'zlib'
 require 'yaml'
+require 'json'
 require 'time'
 require 'pp'
 require 'newrelic_rpm'
@@ -83,6 +84,8 @@ def deflate_body(data)
     no_cache if data.nil? or data.empty?
     if params[:sizeonly]
         body data.size.to_s
+    elsif params[:callback]
+        body data.to_json
     else
         body data
     end
