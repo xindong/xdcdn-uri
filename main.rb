@@ -261,9 +261,19 @@ end
 
 get '/:repo/preload/:tag1..:tag2' do
     data = []
+    diff_blobs = [] # 记录在 diff 里已经有的 file_id
     $uri[@repo].diff(params[:tag1], params[:tag2]).each { |path, blob|
         data << "http://#{request.host}/#{params[:repo]}/file/#{blob}/#{File.basename(path)}"
+        diff_blobs << blob
     }
+    if params[:getall]
+        $uri[@repo].index(params[:tag1]).each { |dir, tid|
+            $uri[@repo].grit.tree(tid).blobs.each { |b|
+                next if diff_blobs.include? b.id
+                data << "http://#{request.host}/#{params[:repo]}/tree/#{tid}/#{b.basename}"
+            }
+        }
+    end
     echo_mt "text/plain; charset=utf-8"
     echo_body data
 end
@@ -273,7 +283,6 @@ get '/:repo/preload/:tag' do
     $uri[@repo].index(params[:tag]).each { |dir, tid|
         $uri[@repo].grit.tree(tid).blobs.each { |b|
             data << "http://#{request.host}/#{params[:repo]}/tree/#{tid}/#{b.basename}"
-            #data << "http://#{request.host}/#{params[:repo]}/file/#{b.id}/#{b.basename}"
         }
     }
     echo_mt "text/plain; charset=utf-8"
