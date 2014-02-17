@@ -86,7 +86,11 @@ def echo_body(data)
         if params[:sizeonly]
             body "#{params[:callback]}(#{data.size})"
         else
-            body "#{params[:callback]}(#{data.to_json})"
+            rescue
+                body "#{params[:callback]}(#{data.to_json})"
+            when Encoding::UndefinedConversionError
+                body data
+            end
         end
     else
         if data.class == Array
