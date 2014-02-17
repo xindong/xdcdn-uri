@@ -85,11 +85,7 @@ def echo_body(data)
     if params[:sizeonly]
         body data.size.to_s
     elsif params[:callback]
-        if data.class == Array
-            body data.to_json
-        else
-            body "#{params[:callback]}(#{data.to_json})"
-        end
+        body "#{params[:callback]}(#{data.to_json})"
     else
         if data.class == Array
             body data.join("\n")
