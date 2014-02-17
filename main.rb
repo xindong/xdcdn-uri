@@ -80,7 +80,7 @@ def echo_mt(mt)
     end
 end
 
-def deflate_body(data)
+def echo_body(data)
     no_cache if data.nil? or data.empty?
     if params[:sizeonly]
         body data.size.to_s
@@ -214,7 +214,7 @@ get '/:repo/index/:tag' do
     end
     echo_mt 'text/plain; charset=utf-8'
     expires 3600, :public, :must_revalidate
-    deflate_body dat
+    echo_body dat
 end
 
 get '/:repo/diff/:tag1..:tag2' do
@@ -233,7 +233,7 @@ get '/:repo/diff/:tag1..:tag2' do
     end
     echo_mt 'text/plain; charset=utf-8'
     expires 3600, :public, :must_revalidate
-    deflate_body dat
+    echo_body dat
 end
 
 get '/:repo/files/:tag' do
@@ -252,14 +252,14 @@ get '/:repo/files/:tag' do
     end
     echo_mt 'text/plain; charset=utf-8'
     expires 3600, :public, :must_revalidate
-    deflate_body dat
+    echo_body dat
 end
 
 get '/:repo/file/:blob_id.:ext' do
     begin
         blob = $uri[@repo].file(:blob_id => params[:blob_id])
         echo_mt params[:ext]
-        deflate_body blob['data']
+        echo_body blob['data']
     rescue Chandy::NotFound => e
         log e.reason
         halt 404
@@ -271,7 +271,7 @@ get '/:repo/file/:blob_id/:file' do
         blob = $uri[@repo].file(:blob_id => params[:blob_id])
         log("/#{params[:repo]}/file/#{params[:blob_id]}/#{params[:file]} : #{blob['bytes']}")
         echo_mt File.extname(params[:file])
-        deflate_body blob['data']
+        echo_body blob['data']
     rescue Chandy::NotFound => e
         log e.reason
         halt 404
@@ -282,7 +282,7 @@ get '/:repo/tree/:tree/:file' do
     begin
         blob = $uri[@repo].file(:tree_id => params[:tree], :filename => params[:file])
         echo_mt File.extname(params[:file])
-        deflate_body blob['data']
+        echo_body blob['data']
     rescue Chandy::NotFound => e
         log e.reason
         halt 404
@@ -293,7 +293,7 @@ get %r{^/([a-z]+)/load/([a-zA-Z0-9_\-\.]+)/(\S+)} do
     begin
         blob = $uri[@repo].file(:tag => params[:captures][1], :path => params[:captures][2])
         echo_mt File.extname(params[:captures][2])
-        deflate_body blob['data']
+        echo_body blob['data']
     rescue Chandy::NotFound => e
         log e.reason
         halt 404
@@ -306,7 +306,7 @@ get '/:repo/preload/:tag1..:tag2' do
         data << "http://#{request.host}/#{params[:repo]}/file/#{blob}/#{File.basename(path)}"
     }
     echo_mt "text/plain; charset=utf-8"
-    data.join("\n")
+    echo_body data.join("\n")
 end
 
 get '/:repo/preload/:tag' do
@@ -318,7 +318,7 @@ get '/:repo/preload/:tag' do
         }
     }
     echo_mt "text/plain; charset=utf-8"
-    data.join("\n")
+    echo_body data.join("\n")
 end
 
 get '/:repo/status' do
@@ -327,7 +327,7 @@ get '/:repo/status' do
     file = "#{APP_ROOT}/log/uri_#{params[:repo]}.txt"
     halt 404 unless File.exists?(file)
     text = `tail -n 200 #{file}`
-    deflate_body text
+    echo_body text
 end
 
 get '/:repo/404' do
@@ -337,6 +337,6 @@ get '/:repo/404' do
     urls = []
     do_redis { klist = $redis.keys("V:Chandy:NotFound:/#{params[:repo]}/*") }
     klist.each { |key| urls << key.gsub(/^V:Chandy:NotFound:/, '') }
-    deflate_body urls.join("\n")
+    echo_body urls.join("\n")
 end
 
