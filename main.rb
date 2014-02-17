@@ -266,7 +266,7 @@ get '/:repo/preload/:tag1..:tag2' do
         data << "http://#{request.host}/#{params[:repo]}/file/#{blob}/#{File.basename(path)}"
         diff_blobs << blob
     }
-    if params[:getall]
+    if params[:getall] # 非常消耗性能
         $uri[@repo].index(params[:tag1]).each { |dir, tid|
             $uri[@repo].grit.tree(tid).blobs.each { |b|
                 next if diff_blobs.include? b.id
