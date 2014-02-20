@@ -4,5 +4,9 @@ set :stage, :pd_www
 server '116.182.64.232', user: 'www' , port: 22281, roles: %w{nodes_www}
 server '116.182.64.232', user: 'www' , port: 22291, roles: %w{nodes_www}
 server '116.182.64.232', user: 'www' , port: 22301, roles: %w{nodes_www}
+server '223.202.26.147', user: 'www' , port: 22   , roles: %w{nodes_www}
+server '223.202.26.148', user: 'www' , port: 22   , roles: %w{nodes_www}
+server '223.202.26.149', user: 'www' , port: 22   , roles: %w{nodes_www}
 server '60.251.11.28'  , user: 'www' , port: 22   , roles: %w{nodes_www}
 server '60.251.11.29'  , user: 'www' , port: 22   , roles: %w{nodes_www}
+server '162.243.140.6' , user: 'www' , port: 22   , roles: %w{nodes_www}
