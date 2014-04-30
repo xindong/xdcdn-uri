@@ -118,8 +118,7 @@ end
 
 error 404 do
     key = "V:Chandy:NotFound:#{request.path_info}"
-    do_redis { $redis.set(key, "1") }
-    do_redis { $redis.expire(key, 60) }
+    do_redis { $redis.set(key, "1", :ex => 60, :nx => true) }
     no_cache
     echo_mt 'text/plain; charset=utf-8'
     body "404
