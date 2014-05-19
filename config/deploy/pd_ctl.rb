@@ -8,5 +8,5 @@ server '223.202.26.149', user: 'root', port: 22   , roles: %w{nodes_ctl}
 server '60.251.11.28'  , user: 'root', port: 22   , roles: %w{nodes_ctl}
 server '60.251.11.29'  , user: 'root', port: 22   , roles: %w{nodes_ctl}
 server '106.186.22.159', user: 'root', port: 22   , roles: %w{nodes_ctl}
-server '162.243.140.6' , user: 'root', port: 22   , roles: %w{nodes_ctl}
+server '23.239.25.98'  , user: 'root', port: 22   , roles: %w{nodes_ctl}
 

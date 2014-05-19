@@ -10,4 +10,4 @@ server '223.202.26.149', user: 'www' , port: 22   , roles: %w{nodes_www}
 server '60.251.11.28'  , user: 'www' , port: 22   , roles: %w{nodes_www}
 server '60.251.11.29'  , user: 'www' , port: 22   , roles: %w{nodes_www}
 server '106.186.22.159', user: 'www' , port: 22   , roles: %w{nodes_www}
-server '162.243.140.6' , user: 'www' , port: 22   , roles: %w{nodes_www}
+server '23.239.25.98'  , user: 'www' , port: 22   , roles: %w{nodes_www}
