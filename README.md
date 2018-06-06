@@ -21,11 +21,13 @@
   <pre>rm -fr *</pre>
   3. 整体复制目的版本至仓库
   4. 运行脚本，将所有文件的属性改为 0644，所有目录属性改为 0755，以免只因为属性的变化造成 Object / Tree 的 ID 发生改变
-  <pre>find . -type f | xargs chmod 0644
-  find . -type d | xargs chmod 0755</pre>
+  <pre>
+  find . -type f | xargs chmod 0644
+  find . -type d | xargs chmod 0755
+  </pre>
   5. 测试 OK 后打标签：git commit && git tag *20120907A* 表示 2012-09-07的第1个版本
   6. 提交标签
-  <pre>git push && git push -\-tags</pre>
+  <pre>git push && git push --tags</pre>
 
 ### 接口：
 
