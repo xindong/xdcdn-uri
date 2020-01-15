@@ -32,15 +32,15 @@
 ### 接口：
 
   - 索引文件（CDN 缓存 **1小时**）：
-    - <pre>http://uri.xdcdn.net/REPO_SLUG/index/BASE_TAG</pre>
-    - <pre>http://uri.xdcdn.net/REPO_SLUG/diff/BASE_TAG..LAST_TAG</pre>
+      - <pre>http://uri.xdcdn.net/REPO_SLUG/index/BASE_TAG</pre>
+      - <pre>http://uri.xdcdn.net/REPO_SLUG/diff/BASE_TAG..LAST_TAG</pre>
   - 文件内容（CDN 缓存 **1年**）：
-    - <pre>http://uri.xdcdn.net/REPO_SLUG/tree/GIT_TREE/FILE_NAME</pre>
-    - <pre>http://uri.xdcdn.net/REPO_SLUG/file/BLOB_ID/FILE_NAME</pre>
-    - <pre>http://uri.xdcdn.net/REPO_SLUG/load/LAST_TAG/PATH_TO_FILE</pre>
+      - <pre>http://uri.xdcdn.net/REPO_SLUG/tree/GIT_TREE/FILE_NAME</pre>
+      - <pre>http://uri.xdcdn.net/REPO_SLUG/file/BLOB_ID/FILE_NAME</pre>
+      - <pre>http://uri.xdcdn.net/REPO_SLUG/load/LAST_TAG/PATH_TO_FILE</pre>
   - 预加载文件列表：
-    - <pre>http://uri.xdcdn.net/REPO_SLUG/preload/BASE_TAG</pre>
-    - <pre>http://uri.xdcdn.net/REPO_SLUG/preload/BASE_TAG..LAST_TAG</pre>
+      - <pre>http://uri.xdcdn.net/REPO_SLUG/preload/BASE_TAG</pre>
+      - <pre>http://uri.xdcdn.net/REPO_SLUG/preload/BASE_TAG..LAST_TAG</pre>
   - 内网地址：用 uri.xindong.com 代替 uri.xdcdn.net 进行测试
   
 ### 索引文件格式：
@@ -53,18 +53,18 @@
 
   1. 完成 *更新过程* 后，在后台更新某个测试服的版本名，填入相应 tag，如 *20120825A*
   2. 网页接口根据后台信息，在页面里输出：
-    - cdn_root: "<http://uri.xdcdn.net/ktk/>"
-    - base_tag: "20120825A"
-    - last_tag: "20130604C"
+      - cdn_root: "<http://uri.xdcdn.net/ktk/>"
+      - base_tag: "20120825A"
+      - last_tag: "20130604C"
   3. 客户端拼凑2个索引文件 URL（索引文件 CDN 缓存 **1小时**）
-    - http://uri.xdcdn.net/ktk/index/20120825A
-    - http://uri.xdcdn.net/ktk/diff/20120825A..20130604C
+      - http://uri.xdcdn.net/ktk/index/20120825A
+      - http://uri.xdcdn.net/ktk/diff/20120825A..20130604C
   4. 加载这2个索引文件，分别解析后存在2个 Hash 类型变量中，其中
-    - $idxHash: 将加载到的 http://uri.xdcdn.net/ktk/index/20120825A 的数据以25个字节为一组切开，前5个字节为键名，后20个字节为键值
-    - $dffHash: 将加载到的 http://uri.xdcdn.net/ktk/diff/20120825A..20130604C 的数据以25个字节为一组切开，前5个字节为键名，后20个字节为键值
+      - $idxHash: 将加载到的 http://uri.xdcdn.net/ktk/index/20120825A 的数据以25个字节为一组切开，前5个字节为键名，后20个字节为键值
+      - $dffHash: 将加载到的 http://uri.xdcdn.net/ktk/diff/20120825A..20130604C 的数据以25个字节为一组切开，前5个字节为键名，后20个字节为键值
   5. 封装读取资源的接口，以如下方式拼凑 URL（假设需要加载 assets/TeamBossIMG/4257.jpg ）
-    1. $key = substr(sha1('assets/TeamBossIMG/4257.jpg', true), 0, 5); 用 $key 到 $dffHash 里查找是否有对应的键值 $val
-    2. 如果有，则直接拼凑下载地址 http://uri.xdcdn.net/ktk/file/$val/4257.jpg
-    3. 如果没，则 $key = substr(sha1(dirname('assets/TeamBossIMG'), true), 0, 5); 用 $key 到 $idxHash 里查找是否有对应的键值 $val，没有则出错了，有的话拼凑下载地址 http://uri.xdcdn.net/ktk/tree/$val/4257.jpg
-    4. 如果是根目录下文件，目录名取 '.'，$key = substr(sha1('.', true), 0, 5)，如根目录下 Main.swf: <http://uri.xdcdn.net/ktk/tree/6234ab487915f9bf2cd287a67b44481d627001b8dce8e/Main.swf>
+      1. $key = substr(sha1('assets/TeamBossIMG/4257.jpg', true), 0, 5); 用 $key 到 $dffHash 里查找是否有对应的键值 $val
+      2. 如果有，则直接拼凑下载地址 http://uri.xdcdn.net/ktk/file/$val/4257.jpg
+      3. 如果没，则 $key = substr(sha1(dirname('assets/TeamBossIMG'), true), 0, 5); 用 $key 到 $idxHash 里查找是否有对应的键值 $val，没有则出错了，有的话拼凑下载地址 http://uri.xdcdn.net/ktk/tree/$val/4257.jpg
+      4. 如果是根目录下文件，目录名取 '.'，$key = substr(sha1('.', true), 0, 5)，如根目录下 Main.swf: <http://uri.xdcdn.net/ktk/tree/6234ab487915f9bf2cd287a67b44481d627001b8dce8e/Main.swf>
 
